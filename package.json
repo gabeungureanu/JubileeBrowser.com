@@ -1,0 +1,130 @@
+{
+  "name": "jubilee",
+  "version": "1.0.0",
+  "description": "A dual-mode browser for Internet and JubileeVerse navigation",
+  "main": "dist/main/main.js",
+  "author": {
+    "name": "Jubilee Software, Inc.",
+    "email": "support@jubileebrowser.com"
+  },
+  "scripts": {
+    "start": "npm run build && npm run copy-assets && node scripts/launch-electron.js",
+    "build": "tsc",
+    "copy-assets": "node scripts/copy-assets.js",
+    "watch": "tsc -w",
+    "dev": "concurrently \"npm run watch\" \"node scripts/launch-electron.js\"",
+    "package": "npm run build && npm run copy-assets && electron-builder --win",
+    "package:dir": "npm run build && npm run copy-assets && electron-builder --win --dir",
+    "package:publish": "npm run build && npm run copy-assets && electron-builder --win --publish always",
+    "package:web": "npm run build && npm run copy-assets && electron-builder --win -c.nsis.oneClick=false -c.nsis.artifactName=\"JubileeSetup-${version}-web.${ext}\"",
+    "package:offline": "npm run build && npm run copy-assets && electron-builder --win -c.nsis.artifactName=\"JubileeSetup-${version}-offline.${ext}\"",
+    "package:staging": "npm run build && npm run copy-assets && cross-env CHANNEL=staging electron-builder --win --publish always",
+    "electron": "node scripts/launch-electron.js"
+  },
+  "keywords": [
+    "browser",
+    "electron",
+    "jubileeverse",
+    "inspire"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2",
+    "js-yaml": "^4.1.1",
+    "uuid": "^9.0.1"
+  },
+  "build": {
+    "appId": "com.jubileebrowser.jubilee",
+    "productName": "Jubilee Browser",
+    "executableName": "Jubilee",
+    "copyright": "Copyright © 2024 Jubilee Software, Inc.",
+    "artifactName": "${name}-Setup-${version}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "publisherName": "Jubilee Software, Inc.",
+      "legalTrademarks": "Jubilee is a trademark of Jubilee Software, Inc.",
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false,
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Jubilee Browser",
+      "uninstallDisplayName": "Jubilee Browser",
+      "menuCategory": true,
+      "differentialPackage": true,
+      "deleteAppDataOnUninstall": false,
+      "license": "LICENSE.txt",
+      "warningsAsErrors": false,
+      "runAfterFinish": true,
+      "include": "build/installer.nsh",
+      "installerLanguages": ["en_US"],
+      "language": "1033"
+    },
+    "nsisWeb": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Jubilee Browser",
+      "uninstallDisplayName": "Jubilee Browser",
+      "menuCategory": true,
+      "differentialPackage": true,
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "runAfterFinish": true,
+      "appPackageUrl": "https://downloads.jubileebrowser.com/releases/${channel}/${arch}",
+      "artifactName": "${name}-WebSetup-${version}.${ext}"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "!assets/*.psd",
+      "!assets/*.ai"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/",
+        "to": ".",
+        "filter": ["**/*"]
+      }
+    ],
+    "publish": {
+      "provider": "generic",
+      "url": "https://updates.jubileebrowser.com/releases/stable",
+      "channel": "stable"
+    },
+    "releaseInfo": {
+      "releaseNotes": "See https://jubileebrowser.com/releases for release notes."
+    },
+    "generateUpdatesFilesForAllChannels": true
+  }
+}

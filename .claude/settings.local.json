@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(cat:*)",
+      "Bash(npm run copy-assets:*)",
+      "Bash(npm start)",
+      "Bash(node -e:*)",
+      "Bash(npx electron:*)",
+      "Bash(./node_modules/.bin/electron:*)",
+      "Bash(where:*)",
+      "Bash(env)",
+      "Bash(taskkill:*)",
+      "Bash(pkill:*)",
+      "Bash(tasklist:*)",
+      "Bash(xargs:*)",
+      "Bash(findstr:*)",
+      "Bash(wmic process where \"name=''electron.exe''\" delete)",
+      "Bash(npm run electron:*)",
+      "Bash(timeout:*)",
+      "Bash(start index.html)",
+      "Bash(cmd /c \"cd /d c:\\\\data\\\\JubileeBrowser\\\\website && start index.html\")",
+      "Bash(cmd /c:*)",
+      "Bash(powershell -Command \"cd c:\\\\data\\\\JubileeBrowser; npm run package 2>&1\")",
+      "Bash(powershell -Command \"cd c:\\\\data\\\\JubileeBrowser; $env:CSC_IDENTITY_AUTO_DISCOVERY=''false''; npm run build; npm run copy-assets; npx electron-builder --win --config.win.signAndEditExecutable=false 2>&1\")",
+      "Bash(powershell -Command:*)",
+      "Bash(grep:*)",
+      "Bash(dir:*)",
+      "Bash(cd:*)",
+      "Bash(git init:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
