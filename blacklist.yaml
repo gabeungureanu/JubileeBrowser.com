@@ -1,0 +1,18 @@
+# Jubilee Browser Blacklist Configuration
+# Sites listed here will be blocked from loading in the browser.
+# Add domains (without protocol) to block them.
+
+# Blocked websites - add domains here to block them
+blocked_sites:
+  - playboy.com
+  - www.playboy.com
+
+# You can also block by keyword in URL (partial matches)
+blocked_keywords: []
+
+# Category descriptions (for documentation purposes)
+# categories:
+#   - adult_content
+#   - malware
+#   - phishing
+#   - custom

@@ -1,0 +1,59 @@
+Jubilee Browser
+End User License Agreement
+
+Copyright (c) 2024 Jubilee Software, Inc. All rights reserved.
+
+BY INSTALLING, COPYING, OR OTHERWISE USING THIS SOFTWARE, YOU AGREE TO BE BOUND
+BY THE TERMS OF THIS LICENSE AGREEMENT.
+
+1. LICENSE GRANT
+Jubilee Software, Inc. grants you a non-exclusive, non-transferable license to
+install and use Jubilee Browser on your personal computer for personal,
+non-commercial purposes.
+
+2. RESTRICTIONS
+You may not:
+- Modify, reverse engineer, decompile, or disassemble the Software
+- Rent, lease, or lend the Software
+- Remove any proprietary notices or labels on the Software
+- Use the Software for commercial purposes without authorization
+
+3. INTELLECTUAL PROPERTY
+The Software and all copies thereof are proprietary to Jubilee Software, Inc.
+and title thereto remains in Jubilee Software, Inc. All applicable rights to
+patents, copyrights, trademarks, and trade secrets in the Software are and
+shall remain in Jubilee Software, Inc.
+
+4. DISCLAIMER OF WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. JUBILEE SOFTWARE,
+INC. DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+5. LIMITATION OF LIABILITY
+IN NO EVENT SHALL JUBILEE SOFTWARE, INC. BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER ARISING OUT OF OR RELATED TO YOUR
+USE OR INABILITY TO USE THE SOFTWARE.
+
+6. TERMINATION
+This license is effective until terminated. It will terminate automatically if
+you fail to comply with any term of this Agreement. Upon termination, you must
+destroy all copies of the Software.
+
+7. GOVERNING LAW
+This Agreement shall be governed by the laws of the State of Delaware, USA.
+
+8. PRIVACY
+Jubilee Browser collects minimal data necessary for operation. For our complete
+privacy policy, visit: https://jubileebrowser.com/privacy
+
+9. AUTOMATIC UPDATES
+The Software may automatically download and install updates to improve
+functionality and security. You may disable this feature in Settings.
+
+For questions about this license, contact: legal@jubileebrowser.com
+
+Jubilee Software, Inc.
+Main Website: https://jubileebrowser.com
+Support: https://jubileebrowser.com/support
+Documentation: https://jubileebrowser.com/docs
+Downloads: https://jubileebrowser.com/download

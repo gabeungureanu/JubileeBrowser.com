@@ -1,0 +1,9 @@
+version: 8.0.4
+files:
+  - url: jubilee-Setup-8.0.4.exe
+    sha512: eZfF7VDtEQHmuXtV8lc5N7rDy4doRS1NJjVdcwdep5SytBjzCapkFbzofPLbts7NaTu8vScJjnljD1Hz/air2A==
+    size: 78048520
+path: jubilee-Setup-8.0.4.exe
+sha512: eZfF7VDtEQHmuXtV8lc5N7rDy4doRS1NJjVdcwdep5SytBjzCapkFbzofPLbts7NaTu8vScJjnljD1Hz/air2A==
+releaseNotes: See https://jubileebrowser.com/releases for release notes.
+releaseDate: '2026-01-01T12:44:01.120Z'
