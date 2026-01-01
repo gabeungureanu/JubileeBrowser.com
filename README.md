@@ -154,6 +154,27 @@ npm run build
 npm run copy-assets
 ```
 
+
+### Icon Generation
+The canonical application icon is stored at `website/images/jubilee-logo.png`. To regenerate platform-specific icons:
+
+```bash
+npm run generate-icons
+```
+
+This creates:
+- `assets/icons/icon.ico` - Windows multi-resolution icon
+- `assets/icons/icon.png` - High-resolution PNG
+- `assets/icons/512x512.png` - Linux icon
+- `assets/icons/icon-256.png` - 256x256 PNG
+
+The generated icons are used for:
+- Taskbar/dock icon (runtime)
+- Window icon
+- Start Menu/App Launcher entry
+- Installer and shortcuts
+- In-app header logo
+
 ### Building for Distribution
 ```bash
 # Package for Windows (creates NSIS installer)

@@ -114,7 +114,8 @@ export class NavigationInterceptor {
       url.startsWith('data:') ||
       url.startsWith('about:') ||
       url.startsWith('devtools:') ||
-      url.startsWith('chrome-extension:')
+      url.startsWith('chrome-extension:') ||
+      url.startsWith('jubilee://') // Internal browser pages (settings, etc.)
     );
   }
 
@@ -159,6 +160,15 @@ export class NavigationInterceptor {
 
     // Normalize the URL
     const normalizedUrl = this.normalizeUrl(url, currentMode);
+
+    // Allow jubilee:// URLs in any mode (internal browser pages)
+    if (normalizedUrl.startsWith('jubilee://')) {
+      return {
+        shouldNavigate: true,
+        processedUrl: normalizedUrl,
+        mode: currentMode,
+      };
+    }
 
     if (currentMode === 'jubileebibles') {
       // In JubileeBibles mode, handle .inspire URLs

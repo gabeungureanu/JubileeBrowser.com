@@ -12,12 +12,15 @@
     frame-src 'self' https: http: data: inspire:;
   ">
   <title>Jubilee</title>
+  <link rel="icon" type="image/png" href="jubilee-logo.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="app">
     <!-- Combined Title Bar with Tabs -->
     <header class="title-bar" id="titleBar">
+      <!-- App logo before tabs -->
+      <img src="jubilee-logo.png" alt="Jubilee" class="app-logo" id="appLogo" title="Go to Homepage">
       <!-- Tabs integrated into title bar -->
       <div class="tabs-container" id="tabsContainer">
         <!-- Tabs will be rendered here -->
@@ -67,6 +70,12 @@
           <svg width="16" height="16" viewBox="0 0 16 16">
             <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
             <path d="M8 0L11 3L8 6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+        </button>
+        <button class="nav-btn" id="homeBtn" title="Go to Homepage">
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <path d="M2 8L8 2L14 8" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M4 7V14H6.5V10H9.5V14H12V7" stroke="currentColor" stroke-width="1.5" fill="none"/>
           </svg>
         </button>
       </div>

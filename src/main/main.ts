@@ -36,6 +36,7 @@ import { BlacklistManager } from './blacklistManager';
 import { UpdateManager } from './updateManager';
 import { SessionStateManager } from './sessionStateManager';
 import { FirstRunManager } from './firstRunManager';
+import { InternalPageHandler } from './internalPageHandler';
 
 class JubileeBrowser {
   private windowManager!: WindowManager;
@@ -51,6 +52,7 @@ class JubileeBrowser {
   private updateManager!: UpdateManager;
   private sessionStateManager!: SessionStateManager;
   private firstRunManager!: FirstRunManager;
+  private internalPageHandler!: InternalPageHandler;
   private mainWindow: BrowserWindow | null = null;
 
   async initialize(): Promise<void> {
@@ -78,6 +80,8 @@ class JubileeBrowser {
     // Initialize managers after app is ready
     this.settingsManager = new SettingsManager();
     this.inspireResolver = new InspireResolver();
+    this.internalPageHandler = new InternalPageHandler();
+    this.internalPageHandler.setSettingsManager(this.settingsManager);
     this.modeManager = new ModeManager(this.settingsManager);
     this.historyManager = new HistoryManager();
     this.bookmarkManager = new BookmarkManager();
@@ -197,7 +201,7 @@ class JubileeBrowser {
       // Prevent navigation to unexpected protocols
       contents.on('will-navigate', (event, navigationUrl) => {
         const parsedUrl = new URL(navigationUrl);
-        const allowedProtocols = ['http:', 'https:', 'inspire:', 'file:'];
+        const allowedProtocols = ['http:', 'https:', 'inspire:', 'jubilee:', 'file:'];
 
         if (!allowedProtocols.includes(parsedUrl.protocol)) {
           event.preventDefault();
@@ -225,7 +229,7 @@ class JubileeBrowser {
       callback(allowedPermissions.includes(permission));
     });
 
-    // Register custom protocol handler for inspire://
+    // Register custom protocol handler for inspire:// (JubileeBibles only)
     jubileebiblesSession.protocol.registerStringProtocol('inspire', (request, callback) => {
       const resolution = this.inspireResolver.resolveSync(request.url);
       if (resolution.success && resolution.content) {
@@ -240,6 +244,21 @@ class JubileeBrowser {
         });
       }
     });
+
+    // Register jubilee:// protocol for internal browser pages (both sessions)
+    // This enables jubilee://settings and other internal pages
+    const registerJubileeProtocol = (ses: Electron.Session) => {
+      ses.protocol.registerStringProtocol('jubilee', (request, callback) => {
+        const content = this.internalPageHandler.handle(request.url);
+        callback({
+          mimeType: 'text/html',
+          data: content,
+        });
+      });
+    };
+
+    registerJubileeProtocol(internetSession);
+    registerJubileeProtocol(jubileebiblesSession);
   }
 }
 

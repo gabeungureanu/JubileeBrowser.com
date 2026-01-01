@@ -19,7 +19,9 @@
     "package:web": "npm run build && npm run copy-assets && electron-builder --win -c.nsis.oneClick=false -c.nsis.artifactName=\"JubileeSetup-${version}-web.${ext}\"",
     "package:offline": "npm run build && npm run copy-assets && electron-builder --win -c.nsis.artifactName=\"JubileeSetup-${version}-offline.${ext}\"",
     "package:staging": "npm run build && npm run copy-assets && cross-env CHANNEL=staging electron-builder --win --publish always",
-    "electron": "node scripts/launch-electron.js"
+    "electron": "node scripts/launch-electron.js",
+    "generate-icons": "node scripts/generate-icons.js",
+    "update-blocklist": "node scripts/update-blocklist.js"
   },
   "keywords": [
     "browser",
@@ -36,6 +38,8 @@
     "cross-env": "^10.1.0",
     "electron": "^28.3.3",
     "electron-builder": "^24.9.1",
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.5",
     "typescript": "^5.3.2"
   },
   "dependencies": {
@@ -53,14 +57,17 @@
       "output": "release",
       "buildResources": "build"
     },
+    "icon": "build/icon",
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
-      "icon": "assets/icon.png",
+      "icon": "build/icon.ico",
       "publisherName": "Jubilee Software, Inc.",
       "legalTrademarks": "Jubilee is a trademark of Jubilee Software, Inc.",
       "signAndEditExecutable": false,
@@ -83,7 +90,11 @@
       "warningsAsErrors": false,
       "runAfterFinish": true,
       "include": "build/installer.nsh",
-      "installerLanguages": ["en_US"],
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerLanguages": [
+        "en_US"
+      ],
       "language": "1033"
     },
     "nsisWeb": {
@@ -98,8 +109,8 @@
       "menuCategory": true,
       "differentialPackage": true,
       "deleteAppDataOnUninstall": false,
-      "installerIcon": "assets/icon.ico",
-      "uninstallerIcon": "assets/icon.ico",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
       "runAfterFinish": true,
       "appPackageUrl": "https://downloads.jubileebrowser.com/releases/${channel}/${arch}",
       "artifactName": "${name}-WebSetup-${version}.${ext}"
@@ -114,7 +125,9 @@
       {
         "from": "resources/",
         "to": ".",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "publish": {

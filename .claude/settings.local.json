@@ -39,7 +39,12 @@
       "Bash(cp:*)",
       "Bash(git pull:*)",
       "Bash(git fetch:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(node scripts/fix-homepage.js:*)",
+      "Bash(node scripts/fix-default-url.js:*)",
+      "Bash(node scripts/fix-createtab.js:*)",
+      "Bash(node scripts/generate-icons.js:*)",
+      "Bash(npx serve:*)"
     ]
   }
 }

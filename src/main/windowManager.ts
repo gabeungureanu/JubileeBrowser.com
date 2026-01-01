@@ -118,7 +118,7 @@ export class WindowManager {
   createWindowOnly(): BrowserWindow {
     // Get the icon path - use .ico on Windows, .png on other platforms
     const iconExt = process.platform === 'win32' ? 'icon.ico' : 'icon.png';
-    const iconPath = path.join(__dirname, '../../assets', iconExt);
+    const iconPath = path.join(__dirname, '../../assets/icons', iconExt);
 
     const windowOptions: Electron.BrowserWindowConstructorOptions = {
       width: this.windowState.width,
@@ -245,7 +245,7 @@ export class WindowManager {
   private async createBrowserWindow(mode: WindowMode, isJubileeWindow: boolean): Promise<BrowserWindow> {
     // Get the icon path - use .ico on Windows, .png on other platforms
     const iconExt = process.platform === 'win32' ? 'icon.ico' : 'icon.png';
-    const iconPath = path.join(__dirname, '../../assets', iconExt);
+    const iconPath = path.join(__dirname, '../../assets/icons', iconExt);
 
     // Calculate offset for new window (cascade effect)
     const windowCount = BrowserWindow.getAllWindows().length;

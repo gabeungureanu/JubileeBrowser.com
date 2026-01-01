@@ -47,7 +47,7 @@ export class TabManager {
     let startUrl = url;
     if (!startUrl) {
       startUrl = currentMode === 'jubileebibles'
-        ? 'inspire://home.inspire'
+        ? 'https://www.jubileeverse.com'
         : 'about:blank';
     }
 

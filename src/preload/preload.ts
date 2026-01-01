@@ -106,6 +106,11 @@ interface WindowAPI {
 interface SettingsAPI {
   get: () => Promise<BrowserSettings>;
   set: (updates: Partial<BrowserSettings>) => Promise<{ success: boolean; settings: BrowserSettings }>;
+  reset: () => Promise<{ success: boolean; settings: BrowserSettings }>;
+}
+
+interface PrivacyAPI {
+  clearBrowsingData: (options?: { history?: boolean; cookies?: boolean; cache?: boolean }) => Promise<{ success: boolean; error?: string }>;
 }
 
 interface WebviewAPI {
@@ -274,7 +279,14 @@ contextBridge.exposeInMainWorld('jubilee', {
     get: () => ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_GET),
     set: (updates: Partial<BrowserSettings>) =>
       ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_SET, updates),
+    reset: () => ipcRenderer.invoke(IPC_CHANNELS.SETTINGS_RESET),
   } as SettingsAPI,
+
+  // Privacy
+  privacy: {
+    clearBrowsingData: (options?: { history?: boolean; cookies?: boolean; cache?: boolean }) =>
+      ipcRenderer.invoke(IPC_CHANNELS.PRIVACY_CLEAR_DATA, options),
+  } as PrivacyAPI,
 
   // Webview management
   webview: {
@@ -337,6 +349,7 @@ declare global {
       inspire: InspireAPI;
       window: WindowAPI;
       settings: SettingsAPI;
+      privacy: PrivacyAPI;
       webview: WebviewAPI;
       blacklist: BlacklistAPI;
       update: UpdateAPI;

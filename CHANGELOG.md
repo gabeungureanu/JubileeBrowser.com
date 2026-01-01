@@ -101,13 +101,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Full access to public web (.com, .org, .net, etc.)
   - Blacklist filtering for inappropriate content
   - Standard DNS resolution
-  - Default homepage: https://www.google.com
+  - Default homepage: https://www.jubileeverse.com
 
 - **Jubilee Bible Mode**:
   - .inspire namespace support
   - Restricted to inspire:// protocol by default
   - Enhanced content filtering
-  - Default homepage: inspire://home.inspire
+  - Default homepage: https://www.jubileeverse.com
 
 #### User Interface
 - **Address Bar**: URL entry with search fallback

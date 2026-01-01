@@ -99,6 +99,9 @@ class JubileeBrowserUI {
   private sidePanelType: 'history' | 'bookmarks' = 'history';
   private menuOpen: boolean = false;
   private menuFocusedIndex: number = -1;
+  // Overflow menu dismiss handlers (stored for cleanup)
+  private overflowMenuOutsideClickHandler: ((e: MouseEvent) => void) | null = null;
+  private overflowMenuEscapeHandler: ((e: KeyboardEvent) => void) | null = null;
   private isJubileeWindow: boolean = false;
   private currentZoom: number = 100;
   // Tab context menu state
@@ -121,12 +124,14 @@ class JubileeBrowserUI {
   // DOM Elements
   private elements!: {
     appIcon: HTMLImageElement;
+    appLogo: HTMLImageElement;
     tabsContainer: HTMLElement;
     newTabBtn: HTMLButtonElement;
     navBar: HTMLElement;
     backBtn: HTMLButtonElement;
     forwardBtn: HTMLButtonElement;
     reloadBtn: HTMLButtonElement;
+    homeBtn: HTMLButtonElement;
     addressBar: HTMLInputElement;
     modeToggle: HTMLInputElement;
     modeIndicator: HTMLElement;
@@ -232,12 +237,14 @@ class JubileeBrowserUI {
   private cacheElements(): void {
     this.elements = {
       appIcon: document.getElementById('appIcon') as HTMLImageElement,
+      appLogo: document.getElementById('appLogo') as HTMLImageElement,
       tabsContainer: document.getElementById('tabsContainer')!,
       newTabBtn: document.getElementById('newTabBtn') as HTMLButtonElement,
       navBar: document.getElementById('navBar')!,
       backBtn: document.getElementById('backBtn') as HTMLButtonElement,
       forwardBtn: document.getElementById('forwardBtn') as HTMLButtonElement,
       reloadBtn: document.getElementById('reloadBtn') as HTMLButtonElement,
+      homeBtn: document.getElementById('homeBtn') as HTMLButtonElement,
       addressBar: document.getElementById('addressBar') as HTMLInputElement,
       modeToggle: document.getElementById('modeToggle') as HTMLInputElement,
       modeIndicator: document.getElementById('modeIndicator')!,
@@ -341,6 +348,13 @@ class JubileeBrowserUI {
       });
     }
 
+    // App logo - navigate to home page
+    if (this.elements.appLogo) {
+      this.elements.appLogo.addEventListener('click', () => {
+        this.navigateToHome();
+      });
+    }
+
     // Window controls
     this.elements.minimizeBtn.addEventListener('click', async () => {
       await window.jubilee.window.minimize();
@@ -360,6 +374,7 @@ class JubileeBrowserUI {
     this.elements.backBtn.addEventListener('click', () => this.goBack());
     this.elements.forwardBtn.addEventListener('click', () => this.goForward());
     this.elements.reloadBtn.addEventListener('click', () => this.reload());
+    this.elements.homeBtn.addEventListener('click', () => this.navigateToHome());
 
     // Address bar
     this.elements.addressBar.addEventListener('keydown', (e) => {
@@ -564,8 +579,8 @@ class JubileeBrowserUI {
 
     this.elements.menuSettings.addEventListener('click', () => {
       this.closeOverflowMenu();
-      // Settings functionality (placeholder)
-      console.log('Settings clicked');
+      // Navigate to internal settings page
+      this.navigateToSettings();
     });
 
     this.elements.menuHelp.addEventListener('click', () => {
@@ -593,14 +608,6 @@ class JubileeBrowserUI {
     this.elements.zoomOut.addEventListener('click', (e) => {
       e.stopPropagation();
       this.zoomOut();
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (this.menuOpen && !this.elements.overflowMenu.contains(e.target as Node) &&
-          !this.elements.settingsBtn.contains(e.target as Node)) {
-        this.closeOverflowMenu();
-      }
     });
 
     // Keyboard navigation within the menu
@@ -755,7 +762,8 @@ class JubileeBrowserUI {
     this.tabs = tabs;
     this.activeTabId = tabId;
     this.renderTabs();
-    this.createWebview(tabId, url || this.getDefaultUrl());
+    const defaultUrl = url || await this.getDefaultUrl();
+    this.createWebview(tabId, defaultUrl);
     this.elements.welcomeMessage.classList.remove('visible');
   }
 
@@ -813,12 +821,12 @@ class JubileeBrowserUI {
     webview.setAttribute('allowpopups', 'false');
     webview.setAttribute('webpreferences', 'contextIsolation=yes, nodeIntegration=no, sandbox=yes');
 
-    // Handle JubileeBibles URLs
-    if (this.currentMode === 'jubileebibles' && (url.startsWith('inspire://') || url.endsWith('.inspire'))) {
+    // Handle JubileeBibles inspire:// URLs
+    if (url.startsWith('inspire://') || url.endsWith('.inspire')) {
       // Resolve and load inspire content
       this.loadInspireContent(webview, url);
     } else {
-      // For Internet mode, load the URL directly
+      // For regular URLs (http/https), load directly
       webview.src = url;
     }
 
@@ -1290,11 +1298,12 @@ class JubileeBrowserUI {
     this.updateNavBarStyle();
   }
 
-  private getDefaultUrl(): string {
+  private async getDefaultUrl(): Promise<string> {
+    const settings = await window.jubilee.settings.get();
     if (this.currentMode === 'jubileebibles') {
-      return 'inspire://home.inspire';
+      return settings.homepage.jubileebibles;
     }
-    return 'https://www.google.com';
+    return settings.homepage.internet;
   }
 
   private formatAddressBarDisplay(url: string, isSecure?: boolean): string {
@@ -1316,21 +1325,43 @@ class JubileeBrowserUI {
     return url;
   }
 
-  private navigateToHome(): void {
-    // Navigate to the local home page
+    private async navigateToHome(): Promise<void> {
+    // Navigate to the homepage based on current mode (www.jubileeverse.com for both modes)
+    const settings = await window.jubilee.settings.get();
+    const homeUrl = this.currentMode === 'jubileebibles'
+      ? settings.homepage.jubileebibles
+      : settings.homepage.internet;
+
     const webview = this.activeTabId ? this.webviews.get(this.activeTabId) : null;
     if (webview) {
-      const homeUrl = `file://${window.location.pathname.replace('index.html', 'home.html')}`;
       webview.src = homeUrl;
-      this.elements.addressBar.value = 'jubilee://home';
+      this.elements.addressBar.value = homeUrl;
     } else {
       // Create a new tab with the home page
+      this.createTab().then(async () => {
+        const newWebview = this.activeTabId ? this.webviews.get(this.activeTabId) : null;
+        if (newWebview) {
+          newWebview.src = homeUrl;
+          this.elements.addressBar.value = homeUrl;
+        }
+      });
+    }
+  }
+
+  private navigateToSettings(): void {
+    // Navigate to internal settings page
+    const settingsUrl = 'jubilee://settings';
+    const webview = this.activeTabId ? this.webviews.get(this.activeTabId) : null;
+    if (webview) {
+      webview.src = settingsUrl;
+      this.elements.addressBar.value = settingsUrl;
+    } else {
+      // Create a new tab with the settings page
       this.createTab().then(() => {
         const newWebview = this.activeTabId ? this.webviews.get(this.activeTabId) : null;
         if (newWebview) {
-          const homeUrl = `file://${window.location.pathname.replace('index.html', 'home.html')}`;
-          newWebview.src = homeUrl;
-          this.elements.addressBar.value = 'jubilee://home';
+          newWebview.src = settingsUrl;
+          this.elements.addressBar.value = settingsUrl;
         }
       });
     }
@@ -1588,12 +1619,50 @@ class JubileeBrowserUI {
         firstItem.focus();
       }
     });
+
+    // Add document-level outside click handler (using mousedown for responsiveness)
+    this.overflowMenuOutsideClickHandler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      // Check if click is outside menu and outside settings button
+      if (!this.elements.overflowMenu.contains(target) &&
+          !this.elements.settingsBtn.contains(target)) {
+        this.closeOverflowMenu();
+        this.elements.settingsBtn.focus();
+      }
+    };
+    // Use setTimeout to avoid capturing the opening click
+    setTimeout(() => {
+      if (this.menuOpen) {
+        document.addEventListener('mousedown', this.overflowMenuOutsideClickHandler!);
+      }
+    }, 0);
+
+    // Add document-level Escape key handler
+    this.overflowMenuEscapeHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        this.closeOverflowMenu();
+        this.elements.settingsBtn.focus();
+      }
+    };
+    document.addEventListener('keydown', this.overflowMenuEscapeHandler);
   }
 
   private closeOverflowMenu(): void {
     this.menuOpen = false;
     this.elements.overflowMenu.classList.remove('open');
     this.menuFocusedIndex = -1;
+
+    // Remove document-level handlers to prevent leaks
+    if (this.overflowMenuOutsideClickHandler) {
+      document.removeEventListener('mousedown', this.overflowMenuOutsideClickHandler);
+      this.overflowMenuOutsideClickHandler = null;
+    }
+    if (this.overflowMenuEscapeHandler) {
+      document.removeEventListener('keydown', this.overflowMenuEscapeHandler);
+      this.overflowMenuEscapeHandler = null;
+    }
   }
 
   // ====================================================

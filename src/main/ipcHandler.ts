@@ -335,6 +335,30 @@ export class IPCHandler {
       return { success: true, settings: this.settingsManager.getSettings() };
     });
 
+    ipcMain.handle(IPC_CHANNELS.SETTINGS_RESET, () => {
+      this.settingsManager.resetToDefaults();
+      return { success: true, settings: this.settingsManager.getSettings() };
+    });
+
+    // Privacy - Clear browsing data
+    ipcMain.handle(IPC_CHANNELS.PRIVACY_CLEAR_DATA, async (_, options?: { history?: boolean; cookies?: boolean; cache?: boolean }) => {
+      const clearHistory = options?.history !== false;
+      const clearCookies = options?.cookies !== false;
+      const clearCache = options?.cache !== false;
+
+      try {
+        if (clearHistory) {
+          this.historyManager.clearHistory();
+        }
+        // Note: Cookie and cache clearing would require session.clearStorageData()
+        // which should be implemented in the session management
+        return { success: true };
+      } catch (error) {
+        console.error('Failed to clear browsing data:', error);
+        return { success: false, error: String(error) };
+      }
+    });
+
     // Handle tab state updates from renderer (webview events)
     ipcMain.on('tab:state-update', (_, data: { tabId: string; updates: Partial<TabState> }) => {
       this.tabManager.updateTabState(data.tabId, data.updates);

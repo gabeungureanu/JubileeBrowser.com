@@ -73,21 +73,35 @@ export class SettingsManager {
     base: BrowserSettings,
     updates: Partial<BrowserSettings>
   ): BrowserSettings {
-    return {
-      ...base,
-      ...updates,
-      homepage: {
-        ...base.homepage,
-        ...(updates.homepage || {}),
-      },
-      privacy: {
-        ...base.privacy,
-        ...(updates.privacy || {}),
-      },
-      appearance: {
-        ...base.appearance,
-        ...(updates.appearance || {}),
-      },
-    };
+    return this.deepMerge(base, updates) as BrowserSettings;
+  }
+
+  /**
+   * Deep merge two objects, preserving nested structures
+   */
+  private deepMerge(target: any, source: any): any {
+    const result = { ...target };
+
+    for (const key of Object.keys(source)) {
+      const sourceValue = source[key];
+      const targetValue = target[key];
+
+      if (
+        sourceValue !== null &&
+        typeof sourceValue === 'object' &&
+        !Array.isArray(sourceValue) &&
+        targetValue !== null &&
+        typeof targetValue === 'object' &&
+        !Array.isArray(targetValue)
+      ) {
+        // Recursively merge nested objects
+        result[key] = this.deepMerge(targetValue, sourceValue);
+      } else {
+        // Overwrite with source value
+        result[key] = sourceValue;
+      }
+    }
+
+    return result;
   }
 }

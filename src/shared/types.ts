@@ -209,6 +209,30 @@ export const IPC_CHANNELS = {
   // Settings
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
+  SETTINGS_RESET: 'settings:reset',
+  SETTINGS_GET_SECTION: 'settings:get-section',
+
+  // Profiles
+  PROFILES_LIST: 'profiles:list',
+  PROFILES_CREATE: 'profiles:create',
+  PROFILES_DELETE: 'profiles:delete',
+  PROFILES_SWITCH: 'profiles:switch',
+  PROFILES_GET_ACTIVE: 'profiles:get-active',
+
+  // Passwords
+  PASSWORDS_GET: 'passwords:get',
+  PASSWORDS_SAVE: 'passwords:save',
+  PASSWORDS_DELETE: 'passwords:delete',
+  PASSWORDS_EXPORT: 'passwords:export',
+
+  // Site Permissions
+  SITE_PERMISSIONS_GET: 'site-permissions:get',
+  SITE_PERMISSIONS_SET: 'site-permissions:set',
+  SITE_PERMISSIONS_CLEAR: 'site-permissions:clear',
+  SITE_PERMISSIONS_LIST: 'site-permissions:list',
+
+  // Privacy / Clear Data
+  PRIVACY_CLEAR_DATA: 'privacy:clear-data',
 
   // Auto-update
   UPDATE_CHECK: 'update:check',
@@ -235,19 +259,118 @@ export const IPC_CHANNELS = {
   AUTH_UPDATE_PROFILE: 'auth:update-profile',
 } as const;
 
-// Settings interface
+// ============================================
+// Profile Types
+// ============================================
+
+/**
+ * Individual browser profile settings
+ * Each profile has isolated data (history, bookmarks, passwords, settings)
+ */
+export interface ProfileSettings {
+  id: string;
+  name: string;
+  avatar: string; // Single character or emoji
+  accentColor: string; // Hex color for profile indicator
+  createdAt: number;
+}
+
+/**
+ * Search engine configuration
+ */
+export interface SearchEngine {
+  id: string;
+  name: string;
+  urlTemplate: string; // URL with {searchTerms} placeholder
+  isDefault: boolean;
+}
+
+// ============================================
+// Settings Interface (Expanded)
+// ============================================
+
 export interface BrowserSettings {
+  // Existing settings
   defaultMode: BrowserMode;
   homepage: {
     internet: string;
     jubileebibles: string;
   };
+
+  // Profile & Identity
+  profiles: {
+    active: string; // Active profile ID
+    list: ProfileSettings[];
+  };
+
+  // Autofill & Saved Data
+  autofill: {
+    passwords: {
+      enabled: boolean;
+      autoSignIn: boolean;
+    };
+    addresses: {
+      enabled: boolean;
+    };
+    paymentMethods: {
+      enabled: boolean;
+    };
+  };
+
+  // Privacy & Security (expanded)
   privacy: {
     clearOnExit: boolean;
     doNotTrack: boolean;
+    cookieBehavior: 'allow' | 'block-third-party' | 'block-all';
+    trackingProtection: 'standard' | 'strict' | 'off';
+    safeBrowsing: boolean;
   };
+
+  // Permissions (global defaults)
+  permissions: {
+    camera: 'ask' | 'allow' | 'block';
+    microphone: 'ask' | 'allow' | 'block';
+    location: 'ask' | 'allow' | 'block';
+    notifications: 'ask' | 'allow' | 'block';
+    popups: 'allow' | 'block';
+    javascript: boolean;
+  };
+
+  // Appearance (expanded)
   appearance: {
     theme: 'light' | 'dark' | 'system';
+    fontSize: 'small' | 'medium' | 'large';
+    zoomLevel: number; // 0.5 to 2.0, default 1
+    showBookmarksBar: boolean;
+  };
+
+  // Search & Address Bar
+  search: {
+    defaultEngine: string; // Search engine ID
+    engines: SearchEngine[];
+    suggestionsEnabled: boolean;
+  };
+
+  // Startup & Home Pages
+  startup: {
+    internet: {
+      behavior: 'homepage' | 'restore' | 'specific';
+      pages: string[];
+    };
+    jubileebibles: {
+      behavior: 'homepage' | 'restore' | 'specific';
+      pages: string[];
+    };
+  };
+
+  // Advanced settings
+  advanced: {
+    downloadPath: string;
+    askDownloadLocation: boolean;
+    language: string;
+    spellcheck: boolean;
+    hardwareAcceleration: boolean;
+    backgroundApps: boolean;
   };
 }
 
@@ -258,12 +381,98 @@ export const DEFAULT_SETTINGS: BrowserSettings = {
     internet: 'https://www.jubileeverse.com',
     jubileebibles: 'https://www.jubileeverse.com',
   },
+  profiles: {
+    active: 'default',
+    list: [
+      {
+        id: 'default',
+        name: 'Default',
+        avatar: 'D',
+        accentColor: '#E6AC00',
+        createdAt: Date.now(),
+      },
+    ],
+  },
+  autofill: {
+    passwords: {
+      enabled: true,
+      autoSignIn: true,
+    },
+    addresses: {
+      enabled: true,
+    },
+    paymentMethods: {
+      enabled: false, // Disabled by default for privacy
+    },
+  },
   privacy: {
     clearOnExit: false,
     doNotTrack: true,
+    cookieBehavior: 'block-third-party',
+    trackingProtection: 'standard',
+    safeBrowsing: true,
+  },
+  permissions: {
+    camera: 'ask',
+    microphone: 'ask',
+    location: 'ask',
+    notifications: 'ask',
+    popups: 'block',
+    javascript: true,
   },
   appearance: {
     theme: 'dark',
+    fontSize: 'medium',
+    zoomLevel: 1,
+    showBookmarksBar: false,
+  },
+  search: {
+    defaultEngine: 'jubilee',
+    engines: [
+      {
+        id: 'jubilee',
+        name: 'Jubilee',
+        urlTemplate: 'https://www.jubileeverse.com/search?q={searchTerms}',
+        isDefault: true,
+      },
+      {
+        id: 'google',
+        name: 'Google',
+        urlTemplate: 'https://www.google.com/search?q={searchTerms}',
+        isDefault: false,
+      },
+      {
+        id: 'bing',
+        name: 'Bing',
+        urlTemplate: 'https://www.bing.com/search?q={searchTerms}',
+        isDefault: false,
+      },
+      {
+        id: 'duckduckgo',
+        name: 'DuckDuckGo',
+        urlTemplate: 'https://duckduckgo.com/?q={searchTerms}',
+        isDefault: false,
+      },
+    ],
+    suggestionsEnabled: true,
+  },
+  startup: {
+    internet: {
+      behavior: 'homepage',
+      pages: [],
+    },
+    jubileebibles: {
+      behavior: 'homepage',
+      pages: [],
+    },
+  },
+  advanced: {
+    downloadPath: '', // Empty means use system default
+    askDownloadLocation: false,
+    language: 'en-US',
+    spellcheck: true,
+    hardwareAcceleration: true,
+    backgroundApps: false,
   },
 };
 

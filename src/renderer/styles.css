@@ -316,6 +316,25 @@ body {
   transition: background var(--transition-fast);
 }
 
+/* App Logo in Title Bar (before tabs) */
+.app-logo {
+  height: 15px;
+  margin-top: 10px;
+  width: auto;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  margin-left: 8px;
+  margin-right: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.app-logo:hover {
+  transform: scale(1.1);
+  opacity: 0.85;
+}
+
 .nav-bar.jubileebibles-active {
   background: #E6AC00;
 }
@@ -618,7 +637,7 @@ body.jubileebibles-mode .mode-indicator {
 }
 
 .mode-toggle input:checked + .mode-toggle-slider::before {
-  transform: translateX(19px);
+  transform: translateX(18px);
   background: var(--jubileebibles-accent);
 }
 
