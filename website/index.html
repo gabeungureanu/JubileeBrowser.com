@@ -6,6 +6,9 @@
   <meta name="description" content="Jubilee Browser - A safe, Scripture-centered browser for the faith community. Protect your family while staying grounded in God's Word.">
   <meta name="keywords" content="Jubilee Browser, Christian browser, Bible browser, safe browser, family-friendly browser, church browser">
   <title>Jubilee Browser - A Safe, Scripture-Centered Digital Environment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
@@ -16,7 +19,10 @@
       <div class="header-inner">
         <a href="/" class="logo">
           <img src="images/jubilee-logo.png" alt="Jubilee Browser">
-          <span>Jubilee Browser</span>
+          <div class="logo-text">
+            <span class="logo-title">Jubilee</span>
+            <span class="logo-subtitle">A Safe, Scripture-Centered Browser</span>
+          </div>
         </a>
         <nav class="nav">
           <a href="/" class="nav-link active">Home</a>
@@ -25,37 +31,54 @@
           <a href="/docs/" class="nav-link">Documentation</a>
           <a href="/support/" class="nav-link">Support</a>
           <a href="/enterprise/" class="nav-link">Churches & Schools</a>
-          <a href="/download.html" class="btn btn-primary btn-sm">Get Jubilee</a>
+          <a href="/downloads/jubilee-Setup-8.0.4.exe" class="btn btn-primary btn-sm" download>Download Now</a>
         </nav>
       </div>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <h1 class="hero-title">Navigate the Digital World<br>Without Losing Your Grounding</h1>
-      <p class="hero-subtitle">
-        A safe, Scripture-centered browser for the faith community. Protect your family
-        from harmful content while staying connected to God's Word.
-      </p>
-      <div class="hero-buttons">
-        <a href="/download.html" class="btn btn-primary btn-lg">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 3a1 1 0 011 1v8.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L9 12.586V4a1 1 0 011-1z"/>
-            <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
-          </svg>
-          Download Free
-        </a>
-        <a href="/benefits.html" class="btn btn-outline btn-lg">Why Jubilee?</a>
+  <section class="hero hero-fullimage">
+    <div class="hero-bg hero-slideshow">
+      <img src="images/hero-community01.jpg" alt="Community gathering with Scripture" class="hero-slide active">
+      <img src="images/hero-community02.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community03.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community04.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community05.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community06.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community07.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community08.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community09.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community10.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community11.jpg" alt="Community gathering with Scripture" class="hero-slide">
+      <img src="images/hero-community12.jpg" alt="Community gathering with Scripture" class="hero-slide">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <h1 class="hero-title">Navigate the Digital World<br>Without Losing Your Grounding</h1>
+        <p class="hero-subtitle">
+          A safe, Scripture-centered browser for the faith community. Protect your family
+          from harmful content while staying connected to God's Word.
+        </p>
+        <div class="hero-buttons">
+          <a href="/download.html" class="btn btn-primary btn-lg">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 3a1 1 0 011 1v8.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L9 12.586V4a1 1 0 011-1z"/>
+              <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+            </svg>
+            Download Free
+          </a>
+          <a href="/benefits.html" class="btn btn-outline btn-lg">Why Jubilee?</a>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Mission Statement -->
-  <section class="section" style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; text-align: center;">
+  <section class="section" style="background: #d4a843; text-align: center; padding: 2rem 0;">
     <div class="container">
-      <p style="font-size: 1.5rem; max-width: 900px; margin: 0 auto; line-height: 1.8; font-style: italic;">
+      <p style="font-size: 1.5rem; max-width: 900px; margin: 0 auto; line-height: 1.8; font-style: italic; color: #000000;">
         "Jubilee Browser helps the Church navigate the digital world without losing its grounding in the Word of God."
       </p>
     </div>
@@ -366,5 +389,21 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    // Hero slideshow
+    (function() {
+      const slides = document.querySelectorAll('.hero-slide');
+      let currentSlide = 0;
+
+      function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }
+
+      setInterval(nextSlide, 7000);
+    })();
+  </script>
 </body>
 </html>

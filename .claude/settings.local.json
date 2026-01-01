@@ -31,16 +31,15 @@
       "Bash(git init:*)",
       "Bash(git remote:*)",
       "Bash(git add:*)",
-      "Bash(npm run package:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(npx electron-builder:*)",
       "Bash(cp:*)",
-      "Bash(powershell -ExecutionPolicy Bypass -File \"c:\\\\Data\\\\JubileeBrowser.com\\\\add-hosts.ps1\")",
-      "Bash(curl:*)",
-      "Bash(ipconfig:*)",
-      "Bash(powershell -ExecutionPolicy Bypass -File \"c:\\\\Data\\\\JubileeBrowser.com\\\\check-bindings.ps1\")",
-      "Bash(ping:*)",
-      "Bash(nslookup:*)",
-      "Bash(ls:*)",
-      "Bash(git config:*)"
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
