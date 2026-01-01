@@ -6,3 +6,10 @@ release/
 Thumbs.db
 *.local
 .env
+
+# Exclude large installer files - host these on the web server
+website/downloads/*.exe
+website/downloads/*.blockmap
+
+# Keep the update manifest
+!website/downloads/latest.yml

@@ -1,6 +1,6 @@
 {
   "name": "jubilee",
-  "version": "1.0.0",
+  "version": "8.0.4",
   "description": "A dual-mode browser for Internet and JubileeVerse navigation",
   "main": "dist/main/main.js",
   "author": {
@@ -119,7 +119,7 @@
     ],
     "publish": {
       "provider": "generic",
-      "url": "https://updates.jubileebrowser.com/releases/stable",
+      "url": "http://jubileebrowser.com/downloads",
       "channel": "stable"
     },
     "releaseInfo": {

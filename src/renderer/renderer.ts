@@ -15,6 +15,7 @@ interface TabState {
   canGoBack: boolean;
   canGoForward: boolean;
   mode: BrowserMode;
+  isSecure?: boolean;
 }
 
 interface ExtendedTabState extends TabState {
@@ -795,7 +796,7 @@ class JubileeBrowserUI {
     // Update address bar
     const tab = this.tabs.find((t) => t.id === tabId);
     if (tab) {
-      this.elements.addressBar.value = tab.url;
+      this.elements.addressBar.value = this.formatAddressBarDisplay(tab.url, tab.isSecure);
       this.updateNavigationState();
     }
   }
@@ -900,21 +901,27 @@ class JubileeBrowserUI {
 
     webview.addEventListener('did-navigate', (e: any) => {
       const url = e.url || webview.src;
+      const isSecure = url.startsWith('https://');
+
       window.jubilee.tabs.updateState(tabId, {
         url,
         canGoBack: webview.canGoBack(),
         canGoForward: webview.canGoForward(),
+        isSecure,
       });
 
       if (tabId === this.activeTabId) {
-        this.elements.addressBar.value = url;
+        this.elements.addressBar.value = this.formatAddressBarDisplay(url, isSecure);
         this.updateNavigationState();
       }
     });
 
     webview.addEventListener('did-navigate-in-page', (e: any) => {
+      const url = e.url || webview.src;
+      const isSecure = url.startsWith('https://');
+
       if (tabId === this.activeTabId) {
-        this.elements.addressBar.value = e.url || webview.src;
+        this.elements.addressBar.value = this.formatAddressBarDisplay(url, isSecure);
       }
     });
 
@@ -1032,7 +1039,7 @@ class JubileeBrowserUI {
       // Update active tab tracking
       if ((tab as any).isActive) {
         this.activeTabId = tab.id;
-        this.elements.addressBar.value = tab.url;
+        this.elements.addressBar.value = this.formatAddressBarDisplay(tab.url, tab.isSecure);
       }
     });
 
@@ -1096,7 +1103,8 @@ class JubileeBrowserUI {
       } else {
         webview.src = url;
       }
-      this.elements.addressBar.value = url;
+      const isSecure = url.startsWith('https://');
+      this.elements.addressBar.value = this.formatAddressBarDisplay(url, isSecure);
     }
 
     await window.jubilee.navigation.go(url);
@@ -1287,6 +1295,25 @@ class JubileeBrowserUI {
       return 'inspire://home.inspire';
     }
     return 'https://www.google.com';
+  }
+
+  private formatAddressBarDisplay(url: string, isSecure?: boolean): string {
+    // Don't modify special URLs
+    if (url.startsWith('about:') || url.startsWith('jubilee:') || url.startsWith('file:') || url.startsWith('inspire:')) {
+      return url;
+    }
+
+    // Remove protocol from display
+    let displayUrl = url.replace(/^https?:\/\//, '');
+
+    // Add security prefix
+    if (url.startsWith('https://') || isSecure === true) {
+      return 'https://' + displayUrl;
+    } else if (url.startsWith('http://')) {
+      return 'Not Secure ' + displayUrl;
+    }
+
+    return url;
   }
 
   private navigateToHome(): void {

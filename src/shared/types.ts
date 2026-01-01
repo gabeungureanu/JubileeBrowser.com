@@ -16,6 +16,7 @@ export interface TabState {
   canGoBack: boolean;
   canGoForward: boolean;
   mode: BrowserMode;
+  isSecure?: boolean;
 }
 
 // Navigation entry for history
@@ -254,8 +255,8 @@ export interface BrowserSettings {
 export const DEFAULT_SETTINGS: BrowserSettings = {
   defaultMode: 'internet',
   homepage: {
-    internet: 'https://www.google.com',
-    jubileebibles: 'inspire://home.inspire',
+    internet: 'https://www.jubileeverse.com',
+    jubileebibles: 'https://www.jubileeverse.com',
   },
   privacy: {
     clearOnExit: false,

@@ -131,6 +131,17 @@ export class NavigationInterceptor {
       return true;
     }
 
+    // Allow JubileeVerse.com domain and its subdomains
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname.toLowerCase();
+      if (hostname === 'jubileeverse.com' || hostname.endsWith('.jubileeverse.com')) {
+        return true;
+      }
+    } catch (e) {
+      // Invalid URL, will be rejected
+    }
+
     // For future: allow specific CDNs or asset hosts for JubileeBibles
     // This could be configured per-location
 
