@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/poad/wix4-example/main/schema/wix.json",
+  "product": {
+    "id": "*",
+    "name": "Jubilee Browser",
+    "manufacturer": "Jubilee Browser Team",
+    "version": "8.0.4",
+    "upgradeCode": "A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+  },
+  "package": {
+    "description": "A secure, family-friendly web browser with dual browsing modes",
+    "installScope": "perMachine",
+    "compressed": true,
+    "shortNames": false
+  },
+  "majorUpgrade": {
+    "downgradeErrorMessage": "A newer version of Jubilee Browser is already installed.",
+    "allowSameVersionUpgrades": false,
+    "schedule": "afterInstallInitialize"
+  },
+  "features": [
+    {
+      "id": "MainFeature",
+      "title": "Jubilee Browser",
+      "level": 1,
+      "components": [
+        {
+          "directory": "INSTALLFOLDER",
+          "files": [
+            {
+              "source": "$(var.SourceDir)/**/*"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "directories": [
+    {
+      "id": "ProgramFiles64Folder",
+      "children": [
+        {
+          "id": "INSTALLFOLDER",
+          "name": "Jubilee Browser"
+        }
+      ]
+    },
+    {
+      "id": "ProgramMenuFolder",
+      "children": [
+        {
+          "id": "ApplicationProgramsFolder",
+          "name": "Jubilee Browser"
+        }
+      ]
+    },
+    {
+      "id": "DesktopFolder"
+    }
+  ],
+  "shortcuts": [
+    {
+      "id": "DesktopShortcut",
+      "directory": "DesktopFolder",
+      "name": "Jubilee Browser",
+      "target": "[INSTALLFOLDER]JubileeBrowser.exe",
+      "workingDirectory": "INSTALLFOLDER",
+      "icon": "icon.ico"
+    },
+    {
+      "id": "StartMenuShortcut",
+      "directory": "ApplicationProgramsFolder",
+      "name": "Jubilee Browser",
+      "target": "[INSTALLFOLDER]JubileeBrowser.exe",
+      "workingDirectory": "INSTALLFOLDER",
+      "icon": "icon.ico"
+    }
+  ]
+}

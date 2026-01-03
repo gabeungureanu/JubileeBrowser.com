@@ -1,0 +1,9 @@
+{
+  "updateEndpoint": "https://updates.jubileebrowser.com/releases",
+  "channel": "stable",
+  "checkIntervalHours": 4,
+  "initialDelaySeconds": 30,
+  "applyCheckIntervalMinutes": 5,
+  "expectedCertificateThumbprint": "",
+  "signaturePublicKeyPem": ""
+}

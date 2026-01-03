@@ -1,0 +1,11 @@
+<Project Sdk="WixToolset.Sdk/4.0.5">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+    <SourceDir>..\JubileeBrowser\bin\Release\net8.0-windows\publish\</SourceDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JubileeBrowser\JubileeBrowser.csproj" />
+  </ItemGroup>
+</Project>

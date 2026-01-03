@@ -13,3 +13,27 @@ website/downloads/*.blockmap
 
 # Keep the update manifest
 !website/downloads/latest.yml
+
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.cache
+*.dll
+*.exe
+*.pdb
+!*.csproj
+
+# NuGet
+packages/
+*.nupkg
+
+# Visual Studio
+.vs/
+*.vsidx
+*.testlog
+
+# Windows artifacts
+nul
