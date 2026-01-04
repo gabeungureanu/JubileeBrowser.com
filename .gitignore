@@ -1,13 +1,11 @@
-node_modules/
-dist/
-release/
+# Logs and temporary files
 *.log
 .DS_Store
 Thumbs.db
 *.local
-.env
 
 # Exclude large installer files - host these on the web server
+website/downloads/*.msi
 website/downloads/*.exe
 website/downloads/*.blockmap
 
@@ -17,23 +15,38 @@ website/downloads/*.blockmap
 # .NET build artifacts
 bin/
 obj/
+publish/
 *.user
 *.suo
 *.userprefs
 *.cache
-*.dll
-*.exe
-*.pdb
-!*.csproj
 
 # NuGet
 packages/
 *.nupkg
+.nuget/
 
 # Visual Studio
 .vs/
 *.vsidx
 *.testlog
+*.sln.docstates
+
+# ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
 
 # Windows artifacts
 nul
+
+# WPF specific
+*.baml
+
+# WiX installer build artifacts
+*.msi
+*.wixpdb
+*.wixobj
+*.wixlib

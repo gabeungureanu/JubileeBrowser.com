@@ -1,0 +1,42 @@
+# =============================================================================
+# Mailcow Docker Compose Override for Jubilee Browser
+# =============================================================================
+# Place this file in /opt/mailcow-dockerized/ to customize the deployment.
+# =============================================================================
+
+services:
+  # Postfix - customize for Amazon SES relay
+  postfix-mailcow:
+    environment:
+      - RELAYHOST=${RELAYHOST:-}
+      - RELAYHOST_USERNAME=${RELAYHOST_USERNAME:-}
+      - RELAYHOST_PASSWORD=${RELAYHOST_PASSWORD:-}
+    volumes:
+      - ./data/conf/postfix/extra.cf:/opt/postfix/conf/extra.cf:ro
+      - ./data/conf/postfix/sasl_passwd:/opt/postfix/conf/sasl_passwd:ro
+      - ./data/conf/postfix/header_cleanup:/opt/postfix/conf/header_cleanup:ro
+
+  # SOGo - groupware (optional, can be disabled for pure mail relay)
+  sogo-mailcow:
+    mem_limit: 512m
+
+  # Rspamd - spam filter
+  rspamd-mailcow:
+    mem_limit: 512m
+
+  # Dovecot - IMAP server
+  dovecot-mailcow:
+    mem_limit: 512m
+
+  # ClamAV - can be disabled on low-memory servers
+  # Uncomment to set memory limits
+  # clamd-mailcow:
+  #   mem_limit: 1g
+
+  # MySQL/MariaDB
+  mysql-mailcow:
+    mem_limit: 1g
+
+  # Redis cache
+  redis-mailcow:
+    mem_limit: 256m

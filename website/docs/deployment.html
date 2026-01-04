@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Jubilee Browser Deployment Guide - Deploy across your organization with silent installation, Group Policy, and enterprise management.">
+  <title>Deployment Guide - Jubilee Browser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <style>
+    .doc-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .doc-section {
+      margin-bottom: 3rem;
+    }
+    .doc-section h2 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .doc-section h3 {
+      color: var(--text-primary);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    .doc-section p, .doc-section li {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .doc-section ul, .doc-section ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .doc-section li {
+      margin-bottom: 0.5rem;
+    }
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9rem;
+    }
+    .code-block code {
+      color: #e2e8f0;
+    }
+    .note-box {
+      background: rgba(212, 168, 67, 0.1);
+      border-left: 4px solid var(--primary-color);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note-box strong {
+      color: var(--primary-color);
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-content h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-primary);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .doc-table th, .doc-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: 1px solid var(--border-color);
+    }
+    .doc-table th {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .doc-table td {
+      color: var(--text-secondary);
+    }
+    .doc-table code {
+      background: rgba(0,0,0,0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .breadcrumb {
+      margin-bottom: 2rem;
+      color: var(--text-muted);
+    }
+    .breadcrumb a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <img src="../images/jubilee-logo.png" alt="Jubilee Browser">
+          <div class="logo-text">
+            <span class="logo-title">Jubilee</span>
+            <span class="logo-subtitle">A Safe, Scripture-Centered Browser</span>
+          </div>
+        </a>
+        <nav class="nav">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/benefits.html" class="nav-link">Benefits</a>
+          <a href="/download.html" class="nav-link">Download</a>
+          <a href="/docs/" class="nav-link active">Documentation</a>
+          <a href="/support/" class="nav-link">Support</a>
+          <a href="/enterprise/" class="nav-link">Churches & Schools</a>
+          <a href="/downloads/JubileeBrowser-Setup-8.0.6.msi" class="btn btn-primary btn-sm" download>Download Now</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" style="padding: 2rem 0;">
+    <div class="container">
+      <h1 class="hero-title" style="font-size: 2.5rem;">Deployment Guide</h1>
+      <p class="hero-subtitle">
+        Deploy Jubilee Browser across your organization with enterprise-grade tools and management options.
+      </p>
+    </div>
+  </section>
+
+  <!-- Documentation Content -->
+  <section class="section">
+    <div class="container">
+      <div class="doc-content">
+        <nav class="breadcrumb">
+          <a href="/docs/">Documentation</a> / Deployment Guide
+        </nav>
+
+        <!-- Overview -->
+        <div class="doc-section">
+          <h2>Overview</h2>
+          <p>
+            Jubilee Browser is designed for easy deployment across organizations of all sizes. Whether you're
+            deploying to a small church office or a large school network, this guide provides everything you
+            need to roll out Jubilee Browser efficiently and manage it effectively.
+          </p>
+          <p>This guide covers:</p>
+          <ul>
+            <li>System requirements and prerequisites</li>
+            <li>Silent (unattended) installation</li>
+            <li>Group Policy deployment</li>
+            <li>Configuration management</li>
+            <li>Update management</li>
+            <li>Troubleshooting deployment issues</li>
+          </ul>
+        </div>
+
+        <!-- System Requirements -->
+        <div class="doc-section">
+          <h2>System Requirements</h2>
+          <p>Before deploying Jubilee Browser, ensure your systems meet these minimum requirements:</p>
+
+          <div class="table-wrapper">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Minimum Requirement</th>
+                  <th>Recommended</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Operating System</td>
+                  <td>Windows 10 (64-bit)</td>
+                  <td>Windows 10/11 (64-bit)</td>
+                </tr>
+                <tr>
+                  <td>Processor</td>
+                  <td>1 GHz dual-core</td>
+                  <td>2 GHz quad-core or higher</td>
+                </tr>
+                <tr>
+                  <td>Memory</td>
+                  <td>4 GB RAM</td>
+                  <td>8 GB RAM or more</td>
+                </tr>
+                <tr>
+                  <td>Disk Space</td>
+                  <td>500 MB available</td>
+                  <td>1 GB available</td>
+                </tr>
+                <tr>
+                  <td>Network</td>
+                  <td>Internet connection for updates</td>
+                  <td>Broadband connection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Silent Installation -->
+        <div class="doc-section">
+          <h2>Silent Installation</h2>
+          <p>
+            Silent installation allows you to deploy Jubilee Browser without user interaction. This is ideal
+            for automated deployments via scripts, SCCM, Intune, or other management tools.
+          </p>
+
+          <h3>Basic Silent Install</h3>
+          <p>Run the installer with the <code>/S</code> flag for silent installation:</p>
+          <div class="code-block">
+            <code>JubileeBrowser-Setup-8.0.6.msi /S</code>
+          </div>
+
+          <h3>Silent Install with Custom Directory</h3>
+          <p>Specify an installation directory using <code>/D</code>:</p>
+          <div class="code-block">
+            <code>JubileeBrowser-Setup-8.0.6.msi /S /D=C:\Program Files\JubileeBrowser</code>
+          </div>
+
+          <div class="note-box">
+            <strong>Note:</strong> The <code>/D</code> parameter must be the last parameter on the command line
+            and must not contain quotes, even if the path contains spaces.
+          </div>
+
+          <h3>Command Line Options</h3>
+          <div class="table-wrapper">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/S</code></td>
+                  <td>Silent mode - no UI displayed</td>
+                </tr>
+                <tr>
+                  <td><code>/D=path</code></td>
+                  <td>Custom installation directory</td>
+                </tr>
+                <tr>
+                  <td><code>/NCRC</code></td>
+                  <td>Skip CRC check (not recommended)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Group Policy Deployment -->
+        <div class="doc-section">
+          <h2>Group Policy Deployment</h2>
+          <p>
+            For Active Directory environments, you can deploy Jubilee Browser using Group Policy. This method
+            provides centralized control over installation and configuration.
+          </p>
+
+          <h3>Step-by-Step Deployment</h3>
+
+          <div class="step-item">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <h4>Prepare the Installation Package</h4>
+              <p>Copy the Jubilee Browser installer to a network share accessible by all target computers
+              (e.g., <code>\\server\software\jubilee\</code>).</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <h4>Create Deployment Script</h4>
+              <p>Create a batch file or PowerShell script for silent installation:</p>
+              <div class="code-block">
+                <code>@echo off
+\\server\software\jubilee\JubileeBrowser-Setup-8.0.6.msi /S
+exit /b %errorlevel%</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <h4>Create Group Policy Object</h4>
+              <p>Open Group Policy Management Console and create a new GPO. Navigate to
+              <strong>Computer Configuration > Policies > Windows Settings > Scripts > Startup</strong> and add your deployment script.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <h4>Link and Apply GPO</h4>
+              <p>Link the GPO to the appropriate OU containing target computers. Computers will install
+              Jubilee Browser on their next restart.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration Management -->
+        <div class="doc-section">
+          <h2>Configuration Management</h2>
+          <p>
+            Jubilee Browser stores configuration in the user's AppData folder. For enterprise deployments,
+            you can pre-configure settings using configuration files.
+          </p>
+
+          <h3>Configuration File Location</h3>
+          <div class="code-block">
+            <code>%APPDATA%\Jubilee Browser\settings.json</code>
+          </div>
+
+          <h3>Common Configuration Options</h3>
+          <div class="table-wrapper">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Setting</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>defaultMode</code></td>
+                  <td>string</td>
+                  <td>"internet" or "jubileebibles" - default browsing mode</td>
+                </tr>
+                <tr>
+                  <td><code>homePage</code></td>
+                  <td>string</td>
+                  <td>Default home page URL</td>
+                </tr>
+                <tr>
+                  <td><code>autoUpdate</code></td>
+                  <td>boolean</td>
+                  <td>Enable/disable automatic updates</td>
+                </tr>
+                <tr>
+                  <td><code>contentFiltering</code></td>
+                  <td>boolean</td>
+                  <td>Enable/disable content filtering</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Example Configuration</h3>
+          <div class="code-block">
+            <code>{
+  "defaultMode": "jubileebibles",
+  "homePage": "https://www.jubileeverse.com",
+  "autoUpdate": true,
+  "contentFiltering": true
+}</code>
+          </div>
+        </div>
+
+        <!-- Update Management -->
+        <div class="doc-section">
+          <h2>Update Management</h2>
+          <p>
+            Jubilee Browser includes an automatic update system that checks for new versions and applies
+            updates seamlessly. For enterprise environments, you can control update behavior.
+          </p>
+
+          <h3>Automatic Updates</h3>
+          <p>
+            By default, Jubilee Browser checks for updates on startup and periodically while running.
+            Updates are downloaded in the background and applied when the browser restarts.
+          </p>
+
+          <h3>Disabling Auto-Updates</h3>
+          <p>
+            To manage updates centrally, you can disable automatic updates and deploy new versions through
+            your existing software management tools:
+          </p>
+          <div class="code-block">
+            <code>{
+  "autoUpdate": false
+}</code>
+          </div>
+
+          <div class="note-box">
+            <strong>Recommendation:</strong> If disabling auto-updates, establish a regular update schedule
+            to ensure users receive security patches and new features.
+          </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="doc-section">
+          <h2>Troubleshooting</h2>
+
+          <h3>Installation Fails Silently</h3>
+          <p>If silent installation fails without error messages:</p>
+          <ul>
+            <li>Ensure the user has administrative privileges</li>
+            <li>Check Windows Event Viewer for application errors</li>
+            <li>Verify the installer file isn't corrupted (redownload if needed)</li>
+            <li>Ensure sufficient disk space is available</li>
+          </ul>
+
+          <h3>Browser Doesn't Launch After Installation</h3>
+          <ul>
+            <li>Verify Windows Defender or antivirus isn't blocking the application</li>
+            <li>Check that all Visual C++ redistributables are installed</li>
+            <li>Try running as administrator</li>
+          </ul>
+
+          <h3>Configuration Changes Not Applied</h3>
+          <ul>
+            <li>Ensure JSON syntax is valid in configuration files</li>
+            <li>Restart the browser after making configuration changes</li>
+            <li>Verify file permissions allow writing to the AppData folder</li>
+          </ul>
+        </div>
+
+        <!-- Getting Help -->
+        <div class="doc-section">
+          <h2>Getting Help</h2>
+          <p>
+            Need assistance with your deployment? Our support team is here to help:
+          </p>
+          <ul>
+            <li><a href="/support/">Visit our Support Portal</a></li>
+            <li><a href="/faq.html">Check the FAQs</a></li>
+            <li><a href="mailto:support@jubileebrowser.com">Email support@jubileebrowser.com</a></li>
+          </ul>
+        </div>
+
+        <!-- Navigation -->
+        <div style="display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+          <a href="/docs/" class="btn btn-outline">&larr; Back to Documentation</a>
+          <a href="/docs/auto-update.html" class="btn btn-primary">Auto-Update System &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-section">
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="/download.html">Download</a></li>
+            <li><a href="/benefits.html">Benefits</a></li>
+            <li><a href="/releases/">Release Notes</a></li>
+            <li><a href="/docs/">Documentation</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>For Organizations</h4>
+          <ul class="footer-links">
+            <li><a href="/enterprise/">Churches & Schools</a></li>
+            <li><a href="/docs/deployment.html">Deployment Guide</a></li>
+            <li><a href="/docs/silent-install.html">Silent Installation</a></li>
+            <li><a href="/developers/">Developer Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Support</h4>
+          <ul class="footer-links">
+            <li><a href="/support/">Support Portal</a></li>
+            <li><a href="/faq.html">FAQs</a></li>
+            <li><a href="/support/contact.html">Contact Us</a></li>
+            <li><a href="https://github.com/jubileebrowser/jubilee/issues">Report an Issue</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="/about.html">About Us</a></li>
+            <li><a href="/privacy.html">Privacy Policy</a></li>
+            <li><a href="/terms.html">Terms of Service</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Jubilee Software, Inc. All rights reserved.</p>
+        <p style="margin-top: 0.5rem; opacity: 0.7; font-size: 0.875rem;">
+          Technology that honors Scripture, protects families, and serves the Church.
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

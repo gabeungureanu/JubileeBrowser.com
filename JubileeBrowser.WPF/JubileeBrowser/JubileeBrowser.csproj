@@ -11,7 +11,7 @@
     <RootNamespace>JubileeBrowser</RootNamespace>
     <AssemblyTitle>Jubilee Browser</AssemblyTitle>
     <FileDescription>Jubilee Browser</FileDescription>
-    <Version>8.0.4</Version>
+    <Version>8.0.6</Version>
     <Authors>Jubilee Browser Team</Authors>
     <Company>Jubilee Browser</Company>
     <Product>Jubilee Browser</Product>
@@ -24,6 +24,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JubileeBrowser.Shared\JubileeBrowser.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

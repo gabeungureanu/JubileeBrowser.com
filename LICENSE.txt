@@ -1,7 +1,7 @@
 Jubilee Browser
 End User License Agreement
 
-Copyright (c) 2024 Jubilee Software, Inc. All rights reserved.
+Copyright (c) 2025 Jubilee Software, Inc. All rights reserved.
 
 BY INSTALLING, COPYING, OR OTHERWISE USING THIS SOFTWARE, YOU AGREE TO BE BOUND
 BY THE TERMS OF THIS LICENSE AGREEMENT.

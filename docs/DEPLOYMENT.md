@@ -8,67 +8,78 @@ This guide covers deploying Jubilee Browser in organizational environments such 
 
 ## Table of Contents
 
-1. [Installer Types](#installer-types)
+1. [Installer Overview](#installer-overview)
 2. [Silent Installation](#silent-installation)
 3. [Group Policy Deployment](#group-policy-deployment)
-4. [Configuration Management](#configuration-management)
-5. [Update Management](#update-management)
-6. [Troubleshooting](#troubleshooting)
+4. [SCCM/Intune Deployment](#sccmintune-deployment)
+5. [Configuration Management](#configuration-management)
+6. [Update Management](#update-management)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Installer Types
+## Installer Overview
 
-Jubilee Browser provides two installer variants:
+Jubilee Browser is distributed as a Windows Installer (MSI) package, built with .NET 8 and WPF using Microsoft Edge WebView2.
 
-### Web Installer (Recommended)
-- **File**: `Jubilee-WebSetup-{version}.exe`
-- **Size**: ~2 MB
-- Downloads the full package during installation
-- Ideal for: Individual installations with internet access
+### MSI Installer
+- **File**: `JubileeBrowser-Setup-{version}.msi`
+- **Size**: ~60 MB
+- **Runtime**: Self-contained (.NET 8 runtime included)
+- **Architecture**: 64-bit (x64) only
+- **Prerequisite**: Microsoft Edge WebView2 Runtime (pre-installed on Windows 11, auto-installed on most Windows 10 systems)
 
-### Offline Installer
-- **File**: `Jubilee-Setup-{version}.exe`
-- **Size**: ~80 MB
-- Contains all files needed for installation
-- Ideal for: Air-gapped networks, mass deployment, slow connections
+### Key Features
+- Standard Windows Installer format (MSI)
+- Per-machine installation to Program Files
+- Desktop and Start Menu shortcuts
+- Group Policy compatible
+- Silent installation support
+- Automatic upgrade handling
 
 ---
 
 ## Silent Installation
 
-### Basic Silent Install (Per-User)
+### Basic Silent Install
 
-```batch
-Jubilee-Setup-{version}.exe /S
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet
 ```
 
-### Silent Install (Per-Machine, All Users)
+### Silent Install with Logging
 
-```batch
-Jubilee-Setup-{version}.exe /S /D=C:\Program Files\JubileeBrowser
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet /log install.log
 ```
 
-**Note**: Per-machine installation requires administrator privileges.
+### Silent Install with Custom Directory
+
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet INSTALLFOLDER="C:\Program Files\JubileeBrowser"
+```
 
 ### Full Command-Line Options
 
 | Option | Description |
 |--------|-------------|
-| `/S` | Silent mode (no UI) |
-| `/D=path` | Installation directory |
-| `/NCRC` | Skip CRC check (not recommended) |
-| `/AllUsers` | Install for all users (per-machine) |
-| `/CurrentUser` | Install for current user only (default) |
+| `/i` | Install |
+| `/x` | Uninstall |
+| `/quiet` | Silent mode (no UI) |
+| `/passive` | Unattended mode (progress bar only) |
+| `/log <file>` | Write log to file |
+| `INSTALLFOLDER=path` | Custom installation directory |
 
 ### Exit Codes
 
 | Code | Meaning |
 |------|---------|
 | 0 | Success |
-| 1 | Installation cancelled by user |
-| 2 | Installation failed |
-| 3 | Installation directory already exists |
+| 1602 | User cancelled installation |
+| 1603 | Fatal error during installation |
+| 1618 | Another installation is in progress |
+| 1619 | Installation package could not be opened |
+| 3010 | Restart required |
 
 ### Example: Enterprise Deployment Script
 
@@ -77,18 +88,20 @@ Jubilee-Setup-{version}.exe /S /D=C:\Program Files\JubileeBrowser
 REM Jubilee Browser Enterprise Deployment Script
 REM Run as Administrator
 
-set INSTALLER=\\fileserver\software\Jubilee-Setup-1.0.0.exe
+set INSTALLER=\\fileserver\software\JubileeBrowser-Setup-8.0.6.msi
 set LOG_DIR=C:\Logs\JubileeBrowser
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
 echo Installing Jubilee Browser...
-"%INSTALLER%" /S /AllUsers
+msiexec /i "%INSTALLER%" /quiet /log "%LOG_DIR%\install.log"
 
 if %ERRORLEVEL% EQU 0 (
-    echo Installation successful >> "%LOG_DIR%\install.log"
+    echo Installation successful >> "%LOG_DIR%\status.log"
+) else if %ERRORLEVEL% EQU 3010 (
+    echo Installation successful - restart required >> "%LOG_DIR%\status.log"
 ) else (
-    echo Installation failed with code %ERRORLEVEL% >> "%LOG_DIR%\install.log"
+    echo Installation failed with code %ERRORLEVEL% >> "%LOG_DIR%\status.log"
 )
 ```
 
@@ -96,53 +109,64 @@ if %ERRORLEVEL% EQU 0 (
 
 ## Group Policy Deployment
 
+MSI packages integrate natively with Group Policy Software Installation.
+
 ### Prerequisites
 - Active Directory domain
 - Group Policy Management Console (GPMC)
-- Software distribution share
+- Network share accessible by target computers
 
 ### Step 1: Prepare the Distribution Share
 
 ```
 \\domain.local\NETLOGON\Software\JubileeBrowser\
-    Jubilee-Setup-1.0.0.exe
-    install.bat
-    config\
-        settings.json
+    JubileeBrowser-Setup-8.0.6.msi
 ```
 
-### Step 2: Create Installation Script
+Ensure the share has Read permissions for Domain Computers.
 
-Create `install.bat`:
-
-```batch
-@echo off
-REM Check if already installed
-if exist "C:\Program Files\JubileeBrowser\Jubilee.exe" (
-    exit /b 0
-)
-
-REM Install silently for all users
-"\\domain.local\NETLOGON\Software\JubileeBrowser\Jubilee-Setup-1.0.0.exe" /S /AllUsers
-
-REM Copy preconfigured settings if needed
-if exist "\\domain.local\NETLOGON\Software\JubileeBrowser\config\settings.json" (
-    xcopy /Y "\\domain.local\NETLOGON\Software\JubileeBrowser\config\settings.json" "%LOCALAPPDATA%\JubileeBrowser\"
-)
-```
-
-### Step 3: Create GPO
+### Step 2: Create GPO for Software Installation
 
 1. Open Group Policy Management Console
 2. Create a new GPO: "Deploy Jubilee Browser"
-3. Navigate to: Computer Configuration > Policies > Windows Settings > Scripts > Startup
-4. Add the installation script
+3. Navigate to: **Computer Configuration > Policies > Software Settings > Software Installation**
+4. Right-click > New > Package
+5. Browse to the MSI file using the UNC path (e.g., `\\domain.local\NETLOGON\Software\JubileeBrowser\JubileeBrowser-Setup-8.0.6.msi`)
+6. Select "Assigned" deployment method
 
-### Step 4: Link and Filter
+### Step 3: Link and Apply
 
-1. Link GPO to appropriate OUs
+1. Link GPO to appropriate OUs (e.g., Workstations, Lab Computers)
 2. Configure security filtering if needed
-3. Force update: `gpupdate /force`
+3. Installation occurs at next computer restart
+
+### Upgrading via GPO
+
+To deploy a new version:
+1. Add the new MSI to the same GPO
+2. Right-click the new package > Properties > Upgrades
+3. Add the previous version package
+4. Select "Uninstall the existing package, then install the upgrade package"
+
+---
+
+## SCCM/Intune Deployment
+
+### Microsoft Endpoint Configuration Manager (SCCM)
+
+1. Create a new Application in Software Library
+2. Deployment Type: Windows Installer (MSI)
+3. Installation program: `msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet`
+4. Uninstall program: `msiexec /x {A1B2C3D4-E5F6-7890-ABCD-EF1234567890} /quiet`
+5. Detection Method: MSI product code or file existence check
+
+### Microsoft Intune
+
+1. Add app: Line-of-business app (MSI)
+2. Upload the MSI file
+3. Configure app information
+4. Assign to device groups
+5. MSI command-line arguments: `/quiet`
 
 ---
 
@@ -151,8 +175,8 @@ if exist "\\domain.local\NETLOGON\Software\JubileeBrowser\config\settings.json" 
 ### Default Settings Location
 
 ```
+Per-Machine: C:\Program Files\Jubilee Browser\appsettings.json
 Per-User:    %LOCALAPPDATA%\JubileeBrowser\settings.json
-Per-Machine: C:\Program Files\JubileeBrowser\resources\default-settings.json
 ```
 
 ### Pre-configuring Settings
@@ -161,33 +185,21 @@ Create a `settings.json` file with your organization's defaults:
 
 ```json
 {
-  "homepage": "https://intranet.yourorg.com",
-  "searchEngine": "duckduckgo",
-  "defaultMode": "internet",
+  "homepage": "https://jubileeverse.com",
+  "defaultMode": "jubilee",
   "autoUpdate": true,
-  "theme": "system",
-  "telemetryEnabled": false
+  "theme": "dark"
 }
 ```
 
-### Locking Settings (Enterprise)
+### Blocklist Location
 
-To prevent users from changing certain settings, create a `policies.json`:
-
-```json
-{
-  "homepage": {
-    "value": "https://intranet.yourorg.com",
-    "locked": true
-  },
-  "autoUpdate": {
-    "value": true,
-    "locked": true
-  }
-}
+The content filter blocklist is stored at:
+```
+C:\Program Files\Jubilee Browser\blacklist.yaml
 ```
 
-Place in: `C:\Program Files\JubileeBrowser\resources\policies.json`
+Organizations can customize this file to add or remove blocked domains.
 
 ---
 
@@ -195,43 +207,26 @@ Place in: `C:\Program Files\JubileeBrowser\resources\policies.json`
 
 ### Automatic Updates
 
-By default, Jubilee Browser checks for updates every 4 hours and downloads them in the background. Updates are applied on next restart.
+The Jubilee Browser Update Agent runs as a Windows Service and:
+- Checks for updates every 4 hours
+- Downloads updates in the background
+- Applies updates when the browser is closed
+- Maintains rollback capability
 
 ### Disabling Automatic Updates
 
-For managed environments where updates are controlled centrally:
+For managed environments where updates are controlled centrally, disable the Update Agent service:
 
-1. **Via Settings**: Settings > Updates > Disable automatic updates
-2. **Via Policy**:
-```json
-{
-  "autoUpdate": {
-    "value": false,
-    "locked": true
-  }
-}
+```cmd
+sc stop "JubileeBrowser.UpdateAgent"
+sc config "JubileeBrowser.UpdateAgent" start= disabled
 ```
 
 ### Manual Update Deployment
 
-1. Download new installer from [https://jubileebrowser.com/download](https://jubileebrowser.com/download)
+1. Download new MSI from [https://jubileebrowser.com/download](https://jubileebrowser.com/download)
 2. Deploy using same method as initial installation
-3. The installer handles upgrading existing installations
-
-### Update Channels
-
-| Channel | Description |
-|---------|-------------|
-| `stable` | Production releases (default) |
-| `beta` | Pre-release testing |
-
-To switch channels, modify `%LOCALAPPDATA%\JubileeBrowser\update-state.json`:
-
-```json
-{
-  "channel": "beta"
-}
-```
+3. The MSI handles upgrading existing installations automatically
 
 ---
 
@@ -239,66 +234,82 @@ To switch channels, modify `%LOCALAPPDATA%\JubileeBrowser\update-state.json`:
 
 ### Installation Logs
 
-Installer logs are written to:
-```
-%TEMP%\JubileeBrowser-install.log
-```
-
-Enable verbose logging:
-```batch
-Jubilee-Setup-{version}.exe /S /LOG=%TEMP%\jubilee-install-verbose.log
+Enable MSI logging for troubleshooting:
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /l*v install-verbose.log
 ```
 
 ### Common Issues
 
-#### Installation fails silently
+#### WebView2 Runtime Not Found
 
-**Cause**: Insufficient permissions
-**Solution**: Run as Administrator or use per-user installation
+**Symptom**: Browser fails to start with WebView2 error
+**Solution**: Install the Microsoft Edge WebView2 Runtime from:
+https://developer.microsoft.com/microsoft-edge/webview2/
 
-#### Cannot connect to update server
+```cmd
+REM Download and install WebView2 Evergreen Bootstrapper
+MicrosoftEdgeWebview2Setup.exe /silent /install
+```
+
+#### Installation Fails with 1603
+
+**Cause**: Various - check verbose log
+**Common fixes**:
+- Ensure running as Administrator
+- Check available disk space
+- Verify no previous installation is corrupted
+- Restart Windows Installer service: `net stop msiserver && net start msiserver`
+
+#### Cannot Connect to Update Server
 
 **Cause**: Firewall blocking outbound HTTPS
 **Solution**: Allow outbound connections to:
 - `updates.jubileebrowser.com` (port 443)
-- `downloads.jubileebrowser.com` (port 443)
-
-#### Installation directory access denied
-
-**Cause**: Per-machine install without admin rights
-**Solution**: Use per-user install or run installer elevated
+- `jubileebrowser.com` (port 443)
 
 ### Uninstallation
 
-#### Silent Uninstall
+#### Silent Uninstall by Product Code
 
-```batch
-"C:\Program Files\JubileeBrowser\Uninstall Jubilee Browser.exe" /S
+```cmd
+msiexec /x {A1B2C3D4-E5F6-7890-ABCD-EF1234567890} /quiet
+```
+
+#### Silent Uninstall by MSI File
+
+```cmd
+msiexec /x JubileeBrowser-Setup-8.0.6.msi /quiet
 ```
 
 #### Complete Removal (Including User Data)
 
-```batch
-"C:\Program Files\JubileeBrowser\Uninstall Jubilee Browser.exe" /S
+```cmd
+msiexec /x {A1B2C3D4-E5F6-7890-ABCD-EF1234567890} /quiet
 rmdir /S /Q "%LOCALAPPDATA%\JubileeBrowser"
+rmdir /S /Q "%ProgramData%\JubileeBrowser"
 ```
 
 ### Registry Keys
 
 Installation creates the following registry entries:
 
-**Per-User Installation:**
 ```
-HKCU\Software\JubileeBrowser
-HKCU\Software\Classes\inspire (protocol handler)
+HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\{ProductCode}
+HKLM\Software\JubileeBrowser
 ```
 
-**Per-Machine Installation:**
-```
-HKLM\Software\JubileeBrowser
-HKLM\Software\Classes\inspire (protocol handler)
-HKLM\Software\RegisteredApplications\JubileeBrowser
-```
+---
+
+## System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **OS** | Windows 10 (64-bit) | Windows 10/11 (64-bit) |
+| **Processor** | 1 GHz dual-core | 2 GHz quad-core |
+| **Memory** | 4 GB RAM | 8 GB RAM |
+| **Disk Space** | 200 MB | 500 MB |
+| **Runtime** | WebView2 Runtime | (Included with Windows 11) |
 
 ---
 
@@ -309,7 +320,6 @@ HKLM\Software\RegisteredApplications\JubileeBrowser
 - **Enterprise Portal**: [https://jubileebrowser.com/enterprise](https://jubileebrowser.com/enterprise)
 - **Support Portal**: [https://jubileebrowser.com/support](https://jubileebrowser.com/support)
 - **Email**: support@jubileebrowser.com
-- **Issue Tracker**: [https://github.com/jubileebrowser/jubilee/issues](https://github.com/jubileebrowser/jubilee/issues)
 
 ---
 

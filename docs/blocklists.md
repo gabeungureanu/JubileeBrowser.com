@@ -1,10 +1,12 @@
 # Jubilee Browser Blocklist Sources
 
-This document describes the external blocklist sources used by Jubilee Browser to provide safe browsing protection.
+This document describes the blocklist sources used by Jubilee Browser to provide safe browsing protection.
 
 ## Overview
 
-Jubilee Browser maintains a compiled blocklist (`blocklists/compiled/blacklist.yaml`) that is generated from multiple reputable, continuously maintained external sources. This approach ensures comprehensive coverage that would be impossible to achieve through manual curation.
+Jubilee Browser maintains a compiled blocklist (`blacklist.yaml`) that is generated from multiple reputable, continuously maintained external sources. This approach ensures comprehensive coverage that would be impossible to achieve through manual curation.
+
+The blocklist is embedded in the WPF application and loaded by the `BlacklistManager` service at startup.
 
 ## Source Feeds
 
@@ -53,30 +55,69 @@ Jubilee Browser maintains a compiled blocklist (`blocklists/compiled/blacklist.y
 - **License**: Free for personal/non-commercial use
 - **Usage Notes**: Large comprehensive list. Use selectively to avoid over-blocking.
 
-## Pipeline Process
+## Blocklist Format
 
-1. **Fetch**: Download raw lists from each source
-2. **Normalize**:
-   - Strip comments and metadata
-   - Decode hosts file and AdBlock formats
-   - Extract clean domains (lowercase, no www prefix inconsistencies)
-   - Parse URLs to extract domains where applicable
-3. **De-duplicate**: Remove duplicate entries across sources
-4. **Compile**: Generate sorted YAML with metadata
-5. **Validate**: Ensure output is valid and non-empty
+The blocklist is stored in YAML format at the root of the project:
 
-## Generated Files
+```yaml
+# blacklist.yaml
+domains:
+  - example-blocked-site.com
+  - another-blocked.com
 
-- `blocklists/raw/<source-name>/` - Raw downloaded files (not committed)
-- `blocklists/compiled/blacklist.yaml` - Compiled blocklist (committed)
-- `blocklists/compiled/allowlist.yaml` - False positive overrides (committed)
+keywords:
+  - inappropriate-term
+  - blocked-keyword
+```
 
-## Update Schedule
+### Structure
 
-The blocklist is updated:
-- **Development**: On-demand via `npm run update-blocklist`
-- **CI/CD**: Nightly automated updates with PR creation for changes
-- **Release**: Fresh compilation before each release
+- **domains**: List of exact domain matches (automatically includes subdomains)
+- **keywords**: List of keywords to block in URLs (partial match)
+
+## Integration with WPF Application
+
+The `BlacklistManager` service in the WPF application:
+
+1. Loads `blacklist.yaml` from the application directory at startup
+2. Parses domains and keywords into efficient lookup structures
+3. Intercepts navigation requests via WebView2 events
+4. Blocks requests to matched domains or URLs containing keywords
+5. Displays a blocked page when content is filtered
+
+### Location in Installed Application
+
+```
+C:\Program Files\Jubilee Browser\blacklist.yaml
+```
+
+## Update Process
+
+### For Releases
+
+1. Download latest source feeds
+2. Normalize and parse each feed format
+3. De-duplicate entries across sources
+4. Compile into `blacklist.yaml`
+5. Include in application build
+
+### For Organizations
+
+Organizations can customize the blocklist:
+
+1. Navigate to installation directory
+2. Edit `blacklist.yaml` directly
+3. Restart browser to apply changes
+
+## Metrics
+
+The compiled blocklist typically contains:
+- ~200,000+ adult/gambling domains
+- ~50,000+ tracker/ad domains
+- ~10,000+ phishing domains
+- ~5,000+ malware domains
+
+Total unique domains: 300,000+ (varies based on source updates)
 
 ## Legal Compliance
 
@@ -88,16 +129,16 @@ All source feeds are used in compliance with their respective licenses:
 ## False Positives
 
 If a legitimate site is incorrectly blocked:
-1. Report the issue via GitHub Issues
-2. Add to `blocklists/compiled/allowlist.yaml` with justification
-3. The allowlist takes precedence over the blacklist
 
-## Metrics
+1. Report the issue via GitHub Issues or support@jubileebrowser.com
+2. Add an allowlist entry (feature in development)
+3. Manually remove from `blacklist.yaml` as a workaround
 
-The compiled blocklist typically contains:
-- ~200,000+ adult/gambling domains
-- ~50,000+ tracker/ad domains
-- ~10,000+ phishing domains
-- ~5,000+ malware domains
+## Technical Implementation
 
-Total unique domains: varies based on source updates
+The blocking is implemented in [BlacklistManager.cs](../JubileeBrowser.WPF/JubileeBrowser/Services/BlacklistManager.cs):
+
+- Uses `HashSet<string>` for O(1) domain lookups
+- Supports wildcard subdomain matching
+- Keyword matching uses efficient string search
+- Loaded asynchronously to avoid blocking startup

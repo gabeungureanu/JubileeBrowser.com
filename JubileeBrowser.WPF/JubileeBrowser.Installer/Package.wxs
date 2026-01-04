@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Name="Jubilee Browser"
            Manufacturer="Jubilee Browser Team"
-           Version="8.0.4.0"
+           Version="8.0.6.0"
            UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
            Compressed="yes"
            InstallerVersion="500"
@@ -16,7 +17,7 @@
 
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="Jubilee Browser">
-        <Component Id="MainExecutable" Guid="*">
+        <Component Id="MainExecutable" Guid="12345678-1234-1234-1234-123456789ABC">
           <File Id="JubileeBrowserExe" Source="$(var.SourceDir)JubileeBrowser.exe" KeyPath="yes">
             <Shortcut Id="DesktopShortcut"
                       Name="Jubilee Browser"
@@ -34,10 +35,6 @@
                       Advertise="yes" />
           </File>
         </Component>
-
-        <Component Id="AppFiles" Guid="*">
-          <Files Include="$(var.SourceDir)**\*.*" Exclude="$(var.SourceDir)JubileeBrowser.exe" />
-        </Component>
       </Directory>
     </StandardDirectory>
 
@@ -48,7 +45,7 @@
 
     <Feature Id="MainFeature" Title="Jubilee Browser" Level="1">
       <ComponentRef Id="MainExecutable" />
-      <ComponentRef Id="AppFiles" />
+      <ComponentGroupRef Id="AppFilesGroup" />
     </Feature>
 
     <!-- WebView2 Runtime Check and Install -->
@@ -69,4 +66,12 @@
             Message="Microsoft Edge WebView2 Runtime is required. Please install it from https://developer.microsoft.com/en-us/microsoft-edge/webview2/" />
 
   </Package>
+
+  <Fragment>
+    <ComponentGroup Id="AppFilesGroup" Directory="INSTALLFOLDER">
+      <Files Include="$(var.SourceDir)**\*.*">
+        <Exclude Files="$(var.SourceDir)JubileeBrowser.exe" />
+      </Files>
+    </ComponentGroup>
+  </Fragment>
 </Wix>

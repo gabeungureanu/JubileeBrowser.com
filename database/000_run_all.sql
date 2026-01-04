@@ -46,6 +46,21 @@
 \echo 'Hit count analytics created successfully.'
 \echo ''
 
+\echo 'Step 6: Creating SSO identity tables...'
+\i 007_sso_identity.sql
+\echo 'SSO identity tables created successfully.'
+\echo ''
+
+\echo 'Step 7: Creating SSO authentication functions...'
+\i 008_sso_functions.sql
+\echo 'SSO functions created successfully.'
+\echo ''
+
+\echo 'Step 8: Seeding SSO roles and permissions...'
+\i 009_sso_seed_data.sql
+\echo 'SSO seed data inserted successfully.'
+\echo ''
+
 \echo '=============================================='
 \echo 'Installation Complete!'
 \echo '=============================================='
@@ -64,6 +79,23 @@ SELECT * FROM resolve_private_url('webspace://jubileeverse.webspace');
 \echo ''
 \echo 'Test 3: List all DNS entries'
 SELECT * FROM list_dns_by_type();
+
+\echo ''
+\echo '=============================================='
+\echo 'Testing SSO Functions...'
+\echo '=============================================='
+\echo ''
+
+\echo 'Test 4: List all roles'
+SELECT "RoleName", "DisplayName", "HierarchyLevel" FROM "UserRoles" ORDER BY "HierarchyLevel";
+
+\echo ''
+\echo 'Test 5: List permissions by category'
+SELECT "ResourceCategory", COUNT(*) as permission_count FROM "RolePermissions" GROUP BY "ResourceCategory";
+
+\echo ''
+\echo 'Test 6: Verify admin user exists'
+SELECT "Username", "Email", "IsActive", "IsEmailVerified" FROM "Users" WHERE "Username" = 'admin';
 
 \echo ''
 \echo 'All tests completed successfully!'

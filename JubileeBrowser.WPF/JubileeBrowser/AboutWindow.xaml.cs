@@ -15,39 +15,18 @@ public partial class AboutWindow : Window
         var version = typeof(MainWindow).Assembly.GetName().Version;
         VersionText.Text = $"Version {version?.Major}.{version?.Minor}.{version?.Build}";
 
-        // Try to load logo from website folder
+        // Load high-quality logo from embedded resources
         try
         {
-            // Try website images folder first (relative to app directory)
-            var appDir = AppDomain.CurrentDomain.BaseDirectory;
-            var websiteDir = System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(appDir)))));
-            var logoPath = System.IO.Path.Combine(websiteDir ?? "", "website", "images", "jubilee-logo.png");
+            var logoImage = new BitmapImage();
+            logoImage.BeginInit();
+            logoImage.UriSource = new Uri("pack://application:,,,/Resources/Icons/jubilee-logo.png", UriKind.Absolute);
+            logoImage.DecodePixelWidth = 172; // 2x the display size (86px) for high-DPI clarity
+            logoImage.CacheOption = BitmapCacheOption.OnLoad;
+            logoImage.EndInit();
+            logoImage.Freeze(); // Make thread-safe and improve performance
 
-            BitmapImage? logoImage = null;
-
-            if (System.IO.File.Exists(logoPath))
-            {
-                logoImage = new BitmapImage(new Uri(logoPath, UriKind.Absolute));
-            }
-            else
-            {
-                // Fallback to icon.ico in Resources
-                var iconPath = System.IO.Path.Combine(appDir, "Resources", "Icons", "icon.ico");
-                if (System.IO.File.Exists(iconPath))
-                {
-                    logoImage = new BitmapImage(new Uri(iconPath, UriKind.Absolute));
-                }
-                else
-                {
-                    // Try pack URI for embedded resource
-                    logoImage = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/icon.ico", UriKind.Absolute));
-                }
-            }
-
-            if (logoImage != null)
-            {
-                AvatarImageBrush.ImageSource = logoImage;
-            }
+            AvatarImageBrush.ImageSource = logoImage;
         }
         catch
         {

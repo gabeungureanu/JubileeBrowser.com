@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jubilee Browser Automated Test Suite</title>
+  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 {
+      color: #1e3a5f;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .run-controls {
+      background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: white;
+      text-align: center;
+    }
+    .run-controls h2 {
+      margin-bottom: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin: 0.25rem;
+    }
+    .btn-large {
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+    }
+    .btn-run {
+      background: #4ade80;
+      color: #1e3a5f;
+    }
+    .btn-run:hover {
+      background: #22c55e;
+      transform: scale(1.02);
+    }
+    .btn-run:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-reset {
+      background: #f87171;
+      color: white;
+    }
+    .btn-reset:hover {
+      background: #ef4444;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+    }
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .progress-section {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .progress-bar-container {
+      background: #e5e5e5;
+      border-radius: 8px;
+      height: 30px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4ade80, #22c55e);
+      border-radius: 8px;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+    .progress-bar.running {
+      background: linear-gradient(90deg, #d4a843, #e6b84d);
+    }
+    .progress-bar.failed {
+      background: linear-gradient(90deg, #f87171, #ef4444);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .stat-box {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f8f8f8;
+    }
+    .stat-box.passed { background: #dcfce7; }
+    .stat-box.failed { background: #fee2e2; }
+    .stat-box.pending { background: #fef3c7; }
+    .stat-box.running { background: #e0f2fe; }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .stat-label {
+      font-size: 0.875rem;
+      color: #666;
+    }
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .test-section h3 {
+      color: #1e3a5f;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .test-section h3 .icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .test-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      background: #f8f8f8;
+      transition: all 0.3s;
+    }
+    .test-item.running {
+      background: #e0f2fe;
+      border-left: 4px solid #0ea5e9;
+    }
+    .test-item.passed {
+      background: #dcfce7;
+      border-left: 4px solid #4ade80;
+    }
+    .test-item.failed {
+      background: #fee2e2;
+      border-left: 4px solid #f87171;
+    }
+    .test-item.skipped {
+      background: #fef3c7;
+      border-left: 4px solid #d4a843;
+    }
+    .test-status-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .test-status-icon.pending { background: #e5e5e5; color: #666; }
+    .test-status-icon.running { background: #0ea5e9; color: white; }
+    .test-status-icon.passed { background: #4ade80; color: white; }
+    .test-status-icon.failed { background: #f87171; color: white; }
+    .test-status-icon.skipped { background: #d4a843; color: white; }
+    .test-name {
+      flex: 1;
+      font-weight: 500;
+    }
+    .test-message {
+      font-size: 0.875rem;
+      color: #666;
+    }
+    .test-time {
+      font-size: 0.75rem;
+      color: #999;
+    }
+    .log-section {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-section h3 {
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+    }
+    .log-entry {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.8rem;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid #334155;
+    }
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry.info { color: #94a3b8; }
+    .log-entry.success { color: #4ade80; }
+    .log-entry.error { color: #f87171; }
+    .log-entry.warn { color: #fbbf24; }
+    .log-time {
+      color: #64748b;
+      margin-right: 0.5rem;
+    }
+    .results-section {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .results-section h3 {
+      color: #1e3a5f;
+      margin-bottom: 1rem;
+    }
+    .results-summary {
+      font-size: 1.25rem;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .results-summary.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .results-summary.partial {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .results-summary.failure {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    pre.results-text {
+      background: #f8f8f8;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e5e5e5;
+      border-top-color: #0ea5e9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .hidden { display: none !important; }
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ddd;
+      color: #666;
+    }
+    .environment-info {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+    .environment-info h4 {
+      color: #0369a1;
+      margin-bottom: 0.5rem;
+    }
+    .env-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+    }
+    .env-item {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .env-label { color: #666; }
+    .env-value { font-weight: 600; color: #1e3a5f; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Jubilee Browser Automated Test Suite</h1>
+    <p class="subtitle">Automated verification tests for Jubilee Browser v8.0.5</p>
+
+    <!-- Environment Info -->
+    <div class="environment-info" id="envInfo">
+      <h4>Environment</h4>
+      <div class="env-grid">
+        <div class="env-item"><span class="env-label">Browser:</span> <span class="env-value" id="envBrowser">Detecting...</span></div>
+        <div class="env-item"><span class="env-label">Version:</span> <span class="env-value" id="envVersion">--</span></div>
+        <div class="env-item"><span class="env-label">Mode:</span> <span class="env-value" id="envMode">--</span></div>
+        <div class="env-item"><span class="env-label">Jubilee API:</span> <span class="env-value" id="envApi">--</span></div>
+      </div>
+    </div>
+
+    <!-- Run Controls -->
+    <div class="run-controls">
+      <h2>Test Runner</h2>
+      <button class="btn btn-run btn-large" id="runAllBtn" onclick="runAllTests()">
+        Run All Tests
+      </button>
+      <button class="btn btn-outline" id="resetBtn" onclick="resetTests()">
+        Reset
+      </button>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <h3 id="progressTitle">Ready to run tests</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+      </div>
+      <div class="stats">
+        <div class="stat-box passed">
+          <div class="stat-number" id="passedCount">0</div>
+          <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat-box failed">
+          <div class="stat-number" id="failedCount">0</div>
+          <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-box pending">
+          <div class="stat-number" id="skippedCount">0</div>
+          <div class="stat-label">Skipped</div>
+        </div>
+        <div class="stat-box running">
+          <div class="stat-number" id="totalTime">0ms</div>
+          <div class="stat-label">Total Time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Sections -->
+    <div id="testSections"></div>
+
+    <!-- Log Section -->
+    <div class="log-section">
+      <h3>Test Log</h3>
+      <div id="logEntries"></div>
+    </div>
+
+    <!-- Results Section (hidden until tests complete) -->
+    <div class="results-section hidden" id="resultsSection">
+      <h3>Test Results</h3>
+      <div class="results-summary" id="resultsSummary"></div>
+      <pre class="results-text" id="resultsText"></pre>
+      <button class="btn btn-outline" onclick="copyResults()" style="margin-top: 1rem;">Copy Results</button>
+    </div>
+
+    <footer>
+      <p>Jubilee Browser Automated Test Suite v8.0.5 | &copy; 2025 Jubilee Software, Inc.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Test configuration
+    const testSuites = [
+      {
+        name: 'Environment Detection',
+        icon: '🔍',
+        tests: [
+          {
+            id: 'env-jubilee-api',
+            name: 'Jubilee API Available',
+            description: 'Check if window.jubilee API is available',
+            run: async () => {
+              if (typeof window.jubilee !== 'undefined') {
+                return { passed: true, message: 'window.jubilee API detected' };
+              }
+              return { passed: false, message: 'window.jubilee API not found - not running in Jubilee Browser' };
+            }
+          },
+          {
+            id: 'env-settings-api',
+            name: 'Settings API Available',
+            description: 'Check if settings API is accessible',
+            run: async () => {
+              if (window.jubilee?.settings?.get) {
+                return { passed: true, message: 'Settings API available' };
+              }
+              return { passed: false, message: 'Settings API not available' };
+            }
+          },
+          {
+            id: 'env-blacklist-api',
+            name: 'Blacklist API Available',
+            description: 'Check if blacklist API is accessible',
+            run: async () => {
+              if (window.jubilee?.blacklist?.check) {
+                return { passed: true, message: 'Blacklist API available' };
+              }
+              return { passed: false, message: 'Blacklist API not available' };
+            }
+          }
+        ]
+      },
+      {
+        name: 'Homepage Configuration',
+        icon: '🏠',
+        tests: [
+          {
+            id: 'homepage-settings-internet',
+            name: 'WWW Mode Homepage Setting',
+            description: 'Verify WWW mode homepage is set to jubileeverse.com',
+            run: async () => {
+              if (!window.jubilee?.settings?.get) {
+                return { passed: false, message: 'Settings API not available', skipped: true };
+              }
+              try {
+                const settings = await window.jubilee.settings.get();
+                const homepage = settings.homepage?.internet;
+                if (homepage && homepage.includes('jubileeverse.com')) {
+                  return { passed: true, message: `Homepage: ${homepage}` };
+                }
+                return { passed: false, message: `Expected jubileeverse.com, got: ${homepage || 'undefined'}` };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'homepage-settings-wwbw',
+            name: 'WWBW Mode Homepage Setting',
+            description: 'Verify WWBW mode homepage is set to jubileeverse.com',
+            run: async () => {
+              if (!window.jubilee?.settings?.get) {
+                return { passed: false, message: 'Settings API not available', skipped: true };
+              }
+              try {
+                const settings = await window.jubilee.settings.get();
+                const homepage = settings.homepage?.jubileebibles;
+                if (homepage && homepage.includes('jubileeverse.com')) {
+                  return { passed: true, message: `Homepage: ${homepage}` };
+                }
+                return { passed: false, message: `Expected jubileeverse.com, got: ${homepage || 'undefined'}` };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          }
+        ]
+      },
+      {
+        name: 'Blacklist Filtering',
+        icon: '🛡️',
+        tests: [
+          {
+            id: 'blacklist-pornhub',
+            name: 'Block pornhub.com',
+            description: 'Verify pornhub.com is blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.pornhub.com');
+                if (result.isBlocked) {
+                  return { passed: true, message: 'Site is blocked' };
+                }
+                return { passed: false, message: 'Site is NOT blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'blacklist-xvideos',
+            name: 'Block xvideos.com',
+            description: 'Verify xvideos.com is blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.xvideos.com');
+                if (result.isBlocked) {
+                  return { passed: true, message: 'Site is blocked' };
+                }
+                return { passed: false, message: 'Site is NOT blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'blacklist-xnxx',
+            name: 'Block xnxx.com',
+            description: 'Verify xnxx.com is blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.xnxx.com');
+                if (result.isBlocked) {
+                  return { passed: true, message: 'Site is blocked' };
+                }
+                return { passed: false, message: 'Site is NOT blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'blacklist-redtube',
+            name: 'Block redtube.com',
+            description: 'Verify redtube.com is blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.redtube.com');
+                if (result.isBlocked) {
+                  return { passed: true, message: 'Site is blocked' };
+                }
+                return { passed: false, message: 'Site is NOT blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'blacklist-allow-google',
+            name: 'Allow google.com',
+            description: 'Verify google.com is NOT blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.google.com');
+                if (!result.isBlocked) {
+                  return { passed: true, message: 'Site is allowed' };
+                }
+                return { passed: false, message: 'Site is incorrectly blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          },
+          {
+            id: 'blacklist-allow-jubileeverse',
+            name: 'Allow jubileeverse.com',
+            description: 'Verify jubileeverse.com is NOT blocked',
+            run: async () => {
+              if (!window.jubilee?.blacklist?.check) {
+                return { passed: false, message: 'Blacklist API not available', skipped: true };
+              }
+              try {
+                const result = await window.jubilee.blacklist.check('https://www.jubileeverse.com');
+                if (!result.isBlocked) {
+                  return { passed: true, message: 'Site is allowed' };
+                }
+                return { passed: false, message: 'Site is incorrectly blocked' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          }
+        ]
+      },
+      {
+        name: 'Browser Mode',
+        icon: '🔄',
+        tests: [
+          {
+            id: 'mode-get-current',
+            name: 'Get Current Mode',
+            description: 'Check if current mode can be retrieved',
+            run: async () => {
+              if (!window.jubilee?.mode?.get) {
+                return { passed: false, message: 'Mode API not available', skipped: true };
+              }
+              try {
+                const mode = await window.jubilee.mode.get();
+                if (mode === 'internet' || mode === 'jubileebibles') {
+                  return { passed: true, message: `Current mode: ${mode}` };
+                }
+                return { passed: false, message: `Invalid mode: ${mode}` };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          }
+        ]
+      },
+      {
+        name: 'Tab Management',
+        icon: '📑',
+        tests: [
+          {
+            id: 'tabs-list',
+            name: 'List Tabs',
+            description: 'Check if tabs can be listed',
+            run: async () => {
+              if (!window.jubilee?.tabs?.getAll) {
+                return { passed: false, message: 'Tabs API not available', skipped: true };
+              }
+              try {
+                const tabs = await window.jubilee.tabs.getAll();
+                if (Array.isArray(tabs) && tabs.length > 0) {
+                  return { passed: true, message: `Found ${tabs.length} tab(s)` };
+                }
+                return { passed: false, message: 'No tabs found' };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          }
+        ]
+      },
+      {
+        name: 'Navigation',
+        icon: '🧭',
+        tests: [
+          {
+            id: 'nav-api',
+            name: 'Navigation API Available',
+            description: 'Check if navigation API is accessible',
+            run: async () => {
+              if (window.jubilee?.navigation) {
+                return { passed: true, message: 'Navigation API available' };
+              }
+              return { passed: false, message: 'Navigation API not available' };
+            }
+          }
+        ]
+      },
+      {
+        name: 'Authentication',
+        icon: '🔐',
+        tests: [
+          {
+            id: 'auth-api',
+            name: 'Auth API Available',
+            description: 'Check if authentication API is accessible',
+            run: async () => {
+              if (window.jubilee?.auth) {
+                return { passed: true, message: 'Auth API available' };
+              }
+              return { passed: false, message: 'Auth API not available' };
+            }
+          },
+          {
+            id: 'auth-session',
+            name: 'Get Session Status',
+            description: 'Check if session can be retrieved',
+            run: async () => {
+              if (!window.jubilee?.auth?.getSession) {
+                return { passed: false, message: 'Auth session API not available', skipped: true };
+              }
+              try {
+                const session = await window.jubilee.auth.getSession();
+                return { passed: true, message: `Authenticated: ${session?.isAuthenticated || false}` };
+              } catch (e) {
+                return { passed: false, message: `Error: ${e.message}` };
+              }
+            }
+          }
+        ]
+      }
+    ];
+
+    // State
+    let testResults = [];
+    let isRunning = false;
+    let startTime = 0;
+
+    // Initialize UI
+    function initializeUI() {
+      // Detect environment
+      detectEnvironment();
+
+      // Render test sections
+      const container = document.getElementById('testSections');
+      container.innerHTML = testSuites.map(suite => `
+        <div class="test-section" id="suite-${suite.name.replace(/\s+/g, '-').toLowerCase()}">
+          <h3><span class="icon">${suite.icon}</span> ${suite.name}</h3>
+          ${suite.tests.map(test => `
+            <div class="test-item" id="test-${test.id}">
+              <div class="test-status-icon pending" id="icon-${test.id}">?</div>
+              <div class="test-name">${test.name}</div>
+              <div class="test-message" id="msg-${test.id}">${test.description}</div>
+              <div class="test-time" id="time-${test.id}"></div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+
+      updateStats();
+    }
+
+    // Detect environment
+    function detectEnvironment() {
+      const isJubilee = typeof window.jubilee !== 'undefined';
+      document.getElementById('envBrowser').textContent = isJubilee ? 'Jubilee Browser' : 'Standard Browser';
+      document.getElementById('envVersion').textContent = isJubilee ? '8.0.5' : 'N/A';
+      document.getElementById('envApi').textContent = isJubilee ? 'Available' : 'Not Available';
+
+      if (isJubilee && window.jubilee.mode?.get) {
+        window.jubilee.mode.get().then(mode => {
+          document.getElementById('envMode').textContent = mode === 'jubileebibles' ? 'WWBW' : 'WWW';
+        }).catch(() => {
+          document.getElementById('envMode').textContent = 'Unknown';
+        });
+      } else {
+        document.getElementById('envMode').textContent = 'N/A';
+      }
+    }
+
+    // Log entry
+    function log(message, type = 'info') {
+      const logContainer = document.getElementById('logEntries');
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    // Update test item UI
+    function updateTestUI(testId, status, message, time) {
+      const item = document.getElementById(`test-${testId}`);
+      const icon = document.getElementById(`icon-${testId}`);
+      const msg = document.getElementById(`msg-${testId}`);
+      const timeEl = document.getElementById(`time-${testId}`);
+
+      item.className = `test-item ${status}`;
+      icon.className = `test-status-icon ${status}`;
+
+      const icons = { pending: '?', running: '⟳', passed: '✓', failed: '✗', skipped: '⊘' };
+      icon.textContent = icons[status] || '?';
+
+      if (message) msg.textContent = message;
+      if (time !== undefined) timeEl.textContent = `${time}ms`;
+    }
+
+    // Update stats
+    function updateStats() {
+      const passed = testResults.filter(r => r.passed && !r.skipped).length;
+      const failed = testResults.filter(r => !r.passed && !r.skipped).length;
+      const skipped = testResults.filter(r => r.skipped).length;
+      const total = testSuites.reduce((sum, s) => sum + s.tests.length, 0);
+      const completed = testResults.length;
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      document.getElementById('passedCount').textContent = passed;
+      document.getElementById('failedCount').textContent = failed;
+      document.getElementById('skippedCount').textContent = skipped;
+      document.getElementById('totalTime').textContent = `${Date.now() - startTime}ms`;
+
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = `${percent}%`;
+      progressBar.textContent = `${percent}%`;
+
+      if (failed > 0) {
+        progressBar.className = 'progress-bar failed';
+      } else if (isRunning) {
+        progressBar.className = 'progress-bar running';
+      } else {
+        progressBar.className = 'progress-bar';
+      }
+    }
+
+    // Run all tests
+    async function runAllTests() {
+      if (isRunning) return;
+
+      isRunning = true;
+      testResults = [];
+      startTime = Date.now();
+
+      document.getElementById('runAllBtn').disabled = true;
+      document.getElementById('runAllBtn').innerHTML = '<span class="spinner"></span> Running...';
+      document.getElementById('progressTitle').textContent = 'Running tests...';
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('logEntries').innerHTML = '';
+
+      log('Starting automated test suite...', 'info');
+
+      for (const suite of testSuites) {
+        log(`Running suite: ${suite.name}`, 'info');
+
+        for (const test of suite.tests) {
+          updateTestUI(test.id, 'running', 'Running...', undefined);
+
+          const testStart = Date.now();
+          try {
+            const result = await test.run();
+            const elapsed = Date.now() - testStart;
+
+            testResults.push({
+              id: test.id,
+              name: test.name,
+              suite: suite.name,
+              passed: result.passed,
+              skipped: result.skipped || false,
+              message: result.message,
+              time: elapsed
+            });
+
+            const status = result.skipped ? 'skipped' : (result.passed ? 'passed' : 'failed');
+            updateTestUI(test.id, status, result.message, elapsed);
+            log(`${status.toUpperCase()}: ${test.name} - ${result.message}`, result.passed ? 'success' : (result.skipped ? 'warn' : 'error'));
+          } catch (e) {
+            const elapsed = Date.now() - testStart;
+            testResults.push({
+              id: test.id,
+              name: test.name,
+              suite: suite.name,
+              passed: false,
+              skipped: false,
+              message: `Exception: ${e.message}`,
+              time: elapsed
+            });
+            updateTestUI(test.id, 'failed', `Exception: ${e.message}`, elapsed);
+            log(`ERROR: ${test.name} - ${e.message}`, 'error');
+          }
+
+          updateStats();
+          await new Promise(r => setTimeout(r, 50)); // Small delay for UI updates
+        }
+      }
+
+      const totalTime = Date.now() - startTime;
+      isRunning = false;
+
+      document.getElementById('runAllBtn').disabled = false;
+      document.getElementById('runAllBtn').innerHTML = 'Run All Tests';
+      document.getElementById('progressTitle').textContent = 'Tests completed';
+      document.getElementById('totalTime').textContent = `${totalTime}ms`;
+
+      log(`Test suite completed in ${totalTime}ms`, 'info');
+      showResults();
+    }
+
+    // Show results
+    function showResults() {
+      const passed = testResults.filter(r => r.passed && !r.skipped).length;
+      const failed = testResults.filter(r => !r.passed && !r.skipped).length;
+      const skipped = testResults.filter(r => r.skipped).length;
+      const total = testResults.length;
+      const percent = Math.round((passed / (total - skipped)) * 100) || 0;
+
+      const summary = document.getElementById('resultsSummary');
+      if (failed === 0 && skipped === 0) {
+        summary.className = 'results-summary success';
+        summary.innerHTML = `✓ All ${passed} tests passed!`;
+      } else if (failed === 0) {
+        summary.className = 'results-summary success';
+        summary.innerHTML = `✓ ${passed} passed, ${skipped} skipped`;
+      } else {
+        summary.className = 'results-summary failure';
+        summary.innerHTML = `✗ ${passed} passed, ${failed} failed, ${skipped} skipped`;
+      }
+
+      // Generate text report
+      let report = `Jubilee Browser v8.0.5 - Automated Test Results\n`;
+      report += `Date: ${new Date().toLocaleString()}\n`;
+      report += `${'='.repeat(60)}\n\n`;
+
+      for (const suite of testSuites) {
+        report += `${suite.icon} ${suite.name}\n`;
+        report += `${'-'.repeat(40)}\n`;
+        const suiteResults = testResults.filter(r => r.suite === suite.name);
+        for (const r of suiteResults) {
+          const status = r.skipped ? 'SKIP' : (r.passed ? 'PASS' : 'FAIL');
+          report += `  [${status}] ${r.name} (${r.time}ms)\n`;
+          report += `         ${r.message}\n`;
+        }
+        report += '\n';
+      }
+
+      report += `${'='.repeat(60)}\n`;
+      report += `SUMMARY: ${passed} passed, ${failed} failed, ${skipped} skipped\n`;
+      report += `Total time: ${Date.now() - startTime}ms\n`;
+
+      document.getElementById('resultsText').textContent = report;
+      document.getElementById('resultsSection').classList.remove('hidden');
+    }
+
+    // Reset tests
+    function resetTests() {
+      if (isRunning) return;
+
+      testResults = [];
+      document.getElementById('logEntries').innerHTML = '';
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('progressTitle').textContent = 'Ready to run tests';
+      document.getElementById('progressBar').style.width = '0%';
+      document.getElementById('progressBar').textContent = '0%';
+      document.getElementById('progressBar').className = 'progress-bar';
+
+      for (const suite of testSuites) {
+        for (const test of suite.tests) {
+          updateTestUI(test.id, 'pending', test.description, undefined);
+          document.getElementById(`time-${test.id}`).textContent = '';
+        }
+      }
+
+      updateStats();
+      log('Tests reset', 'info');
+    }
+
+    // Copy results
+    function copyResults() {
+      const text = document.getElementById('resultsText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Results copied to clipboard!');
+      });
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', initializeUI);
+  </script>
+</body>
+</html>

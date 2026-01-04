@@ -1,9 +1,9 @@
-version: 8.0.4
+version: 8.0.6
 files:
-  - url: jubilee-Setup-8.0.4.exe
-    sha512: eZfF7VDtEQHmuXtV8lc5N7rDy4doRS1NJjVdcwdep5SytBjzCapkFbzofPLbts7NaTu8vScJjnljD1Hz/air2A==
-    size: 78048520
-path: jubilee-Setup-8.0.4.exe
-sha512: eZfF7VDtEQHmuXtV8lc5N7rDy4doRS1NJjVdcwdep5SytBjzCapkFbzofPLbts7NaTu8vScJjnljD1Hz/air2A==
+  - url: JubileeBrowser-Setup-8.0.6.msi
+    sha512: +aD2dVsEdNdKb3qbBaWSZcJs/Q5DvA2WKeS/tSv6z+Dnrfr0DlGL0DPG/44acG3cutrhX+22o2r1wYv8XlZNrg==
+    size: 62937749
+path: JubileeBrowser-Setup-8.0.6.msi
+sha512: +aD2dVsEdNdKb3qbBaWSZcJs/Q5DvA2WKeS/tSv6z+Dnrfr0DlGL0DPG/44acG3cutrhX+22o2r1wYv8XlZNrg==
 releaseNotes: See https://jubileebrowser.com/releases for release notes.
-releaseDate: '2026-01-01T12:44:01.120Z'
+releaseDate: '2026-01-03T23:48:00.000Z'

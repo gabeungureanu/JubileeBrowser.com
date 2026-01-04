@@ -1,197 +1,163 @@
 # Jubilee Browser
 
-**Version 8.0.4** - A dual-mode Electron browser for navigating both the public Internet and JubileeVerse, a Scripture-centered digital environment.
+**Version 8.0.6** - A dual-mode WPF browser for navigating both the public Internet and JubileeVerse, a Scripture-centered digital environment.
 
 ## Overview
 
-Jubilee Browser is a safe, Scripture-centered browser designed for families, churches, and schools. It provides two distinct browsing modes with seamless switching and automatic updates that keep users protected without requiring technical expertise.
+Jubilee Browser is a safe, Scripture-centered browser designed for families, churches, and schools. Built with .NET 8 and WPF using Microsoft Edge WebView2, it provides two distinct browsing modes with seamless switching and enterprise-grade deployment options.
 
 ## Key Features
 
-### 🌐 **Dual-Mode Navigation**
+### Dual-Mode Navigation
 - **Internet Mode**: Full access to the public web with built-in content filtering
 - **Jubilee Bible Mode**: Access to JubileeVerse.com and approved Scripture-centered content
 - **Seamless Switching**: Toggle between modes with Ctrl+Shift+M
 - **Unified Homepage**: Both modes start at www.jubileeverse.com
 
-### 🔒 **Security & Protection**
-- **SSL Certificate Detection**: Address bar displays "Not Secure" for HTTP sites, "https://" for secure connections
-- **Built-in Content Filtering**: Blacklist system blocks inappropriate content by design
-- **Session Isolation**: Complete separation of cookies, storage, and cache between modes
-- **Context Isolation**: Renderer has no direct Node.js access
-- **Secure IPC**: All communication between processes uses typed channels
+### Security & Protection
+- **Built-in Content Filtering**: Blocklist system with 309,000+ blocked sites
+- **Session Isolation**: Complete separation between browsing modes
+- **WebView2 Runtime**: Powered by Microsoft Edge's secure rendering engine
+- **HTTPS Indicators**: Clear visual security indicators in address bar
 
-### 🔄 **Automatic Updates**
-- **Background Updates**: Browser automatically checks for updates every 4 hours
-- **Silent Installation**: Updates install seamlessly without user intervention
-- **No Manual Downloads**: Users never need to reinstall or manually update
-- **Update Server**: http://jubileebrowser.com/downloads
+### Enterprise Deployment
+- **MSI Installer**: Standard Windows Installer for Group Policy deployment
+- **Silent Installation**: `msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet`
+- **Self-Contained**: Includes .NET 8 runtime, no prerequisites needed
+- **Per-Machine Install**: Installs to Program Files for all users
 
-### 🎨 **Professional Branding**
-- **Jubilee Icon**: Custom branding throughout (taskbar, desktop, window, installer)
-- **Chrome-Style Interface**: Familiar tabbed browsing experience
+### Professional Design
+- **Modern WPF Interface**: Fluent Design-inspired UI
+- **Chrome-Style Tabs**: Familiar tabbed browsing experience
 - **Dark Theme**: Professional appearance with Scripture-centered design
+- **Custom Branding**: Jubilee icon throughout the application
 
 ## Architecture
 
 ```
-JubileeBrowser/
-├── src/
-│   ├── main/           # Electron main process
-│   │   ├── main.ts                    # Application entry point
-│   │   ├── windowManager.ts           # Window lifecycle management
-│   │   ├── tabManager.ts              # Tab state and management
-│   │   ├── modeManager.ts             # Internet/Jubilee Bible mode switching
-│   │   ├── inspireResolver.ts         # .inspire namespace resolution
-│   │   ├── navigationInterceptor.ts   # URL filtering and security
-│   │   ├── historyManager.ts          # Browsing history
-│   │   ├── bookmarkManager.ts         # Bookmark management
-│   │   ├── blacklistManager.ts        # Content filtering
-│   │   ├── authenticationManager.ts   # Identity and authentication
-│   │   ├── updateManager.ts           # Automatic update system
-│   │   ├── settingsManager.ts         # User preferences
-│   │   └── ipcHandler.ts              # IPC message routing
-│   ├── preload/        # Secure bridge to renderer
-│   │   └── preload.ts                 # Context bridge API
-│   ├── renderer/       # Browser UI
-│   │   ├── index.html                 # Main browser interface
-│   │   ├── styles.css                 # Application styling
-│   │   └── renderer.ts                # UI logic and state management
-│   └── shared/         # Shared types and constants
-│       └── types.ts                   # TypeScript definitions
-├── assets/             # Application assets (icons, images)
-├── dist/               # Compiled JavaScript output
-├── release/            # Packaged installers
-└── website/            # Public website and download hosting
+JubileeBrowser.com/
+├── JubileeBrowser.WPF/           # WPF Browser Application
+│   ├── JubileeBrowser/           # Main browser application
+│   │   ├── MainWindow.xaml       # Main application window
+│   │   ├── App.xaml              # Application entry point
+│   │   ├── Services/             # Core services
+│   │   │   ├── BlacklistManager.cs      # Content filtering
+│   │   │   ├── TabManager.cs            # Tab state management
+│   │   │   ├── ModeManager.cs           # Internet/Jubilee mode
+│   │   │   ├── SessionStateManager.cs   # Session persistence
+│   │   │   ├── InternalPageHandler.cs   # Internal page routing
+│   │   │   └── WebViewBridge.cs         # WebView2 integration
+│   │   ├── Controls/             # Custom WPF controls
+│   │   ├── Resources/            # Icons and assets
+│   │   └── Models/               # Data models
+│   ├── JubileeBrowser.Installer/ # WiX installer project
+│   │   └── Package.wxs           # WiX installer definition
+│   ├── JubileeBrowser.UpdateAgent/ # Windows Service for updates
+│   └── JubileeBrowser.sln        # Visual Studio solution
+├── database/                     # PostgreSQL database scripts
+│   ├── 001_create_database.sql   # Database creation
+│   ├── 002_create_tables.sql     # Table definitions
+│   ├── 003_create_indexes.sql    # Performance indexes
+│   ├── 004_seed_data.sql         # Initial data
+│   ├── 005_resolver_functions.sql # URL resolution functions
+│   └── 006_hitcount_analytics.sql # Analytics functions
+├── website/                      # Public website and downloads
+│   ├── downloads/                # Installer hosting
+│   ├── docs/                     # Documentation pages
+│   └── *.html                    # Website pages
+├── blacklist.yaml                # Content filtering rules
+├── LICENSE.txt                   # MIT License
+└── README.md                     # This file
 ```
 
-## Browsing Modes
+## System Requirements
 
-### Internet Mode
-- Standard web browsing with full access to public domains
-- Built-in blacklist filters inappropriate content
-- SSL security indicators in address bar
-- Default homepage: https://www.jubileeverse.com
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **OS** | Windows 10 (64-bit) | Windows 10/11 (64-bit) |
+| **Processor** | 1 GHz dual-core | 2 GHz quad-core |
+| **Memory** | 4 GB RAM | 8 GB RAM |
+| **Disk Space** | 200 MB | 500 MB |
+| **Runtime** | WebView2 Runtime | (Included with Windows 11) |
 
-### Jubilee Bible Mode
-- Access to JubileeVerse.com and approved Scripture-centered content
-- .inspire namespace support for Churchnet locations
-- Enhanced content restrictions for family safety
-- Same homepage: https://www.jubileeverse.com
-
-## Security Features
-
-### Address Bar Security Indicators
-- **HTTPS sites**: Display `https://example.com` (secure)
-- **HTTP sites**: Display `Not Secure example.com` (warning)
-- **Special protocols**: inspire://, file://, about:// (unchanged)
-
-### Content Filtering
-- **Blacklist System**: YAML-based configuration blocks harmful sites
-- **Mode-Specific Rules**: Different filtering for each mode
-- **JubileeVerse Access**: Whitelisted in Jubilee Bible Mode
-- **Live Updates**: Blacklist can be updated without reinstalling
-
-### Session Security
-- **Separate Sessions**: Internet and Jubilee Bible modes use isolated sessions
-- **Cookie Isolation**: No data sharing between modes
-- **Secure Storage**: OS-level encryption for tokens and credentials
-- **Permission Control**: Fine-grained permission system per mode
+### WebView2 Runtime
+Jubilee Browser requires the Microsoft Edge WebView2 Runtime. It is:
+- Pre-installed on Windows 11
+- Auto-installed on Windows 10 with recent updates
+- Available at: https://developer.microsoft.com/microsoft-edge/webview2/
 
 ## Installation
 
-### System Requirements
-- **OS**: Windows 10 (64-bit) or Windows 11
-- **Processor**: 1 GHz or faster x64 processor
-- **Memory**: 4 GB RAM minimum, 8 GB recommended
-- **Storage**: 200 MB available space
-
 ### Download
-Visit [http://jubileebrowser.com](http://jubileebrowser.com) to download the latest version.
+Visit [https://jubileebrowser.com/download.html](https://jubileebrowser.com/download.html) to download the latest version.
 
-### Installation Steps
-1. Download `jubilee-Setup-8.0.4.exe` (~75 MB)
-2. Run the installer
+### Standard Installation
+1. Download `JubileeBrowser-Setup-8.0.6.msi` (~60 MB)
+2. Double-click the installer
 3. Follow the installation wizard
-4. Launch Jubilee Browser from desktop or start menu
+4. Launch Jubilee Browser from desktop or Start menu
 
-### First-Time Setup
-On first launch, the browser will:
-- Create user profile in `%APPDATA%\jubilee`
-- Initialize default settings
-- Register for automatic updates
-- Load homepage: www.jubileeverse.com
+### Silent Installation
+For automated deployments:
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet
+```
+
+### Silent Installation with Custom Directory
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet INSTALLFOLDER="C:\Program Files\JubileeBrowser"
+```
 
 ## Development
 
 ### Prerequisites
-- **Node.js** 18+
-- **npm** or yarn
-- **Windows** (for building Windows installers)
+- **Visual Studio 2022** (Community or higher)
+- **.NET 8 SDK**
+- **WiX Toolset v4** (for building installer)
+- **Windows 10/11** (for development)
 
 ### Setup
-```bash
+```powershell
 # Clone repository
 git clone https://github.com/yourorg/jubileebrowser.git
 cd jubileebrowser
 
-# Install dependencies
-npm install
+# Restore NuGet packages
+dotnet restore JubileeBrowser.WPF/JubileeBrowser.sln
+
+# Build solution
+dotnet build JubileeBrowser.WPF/JubileeBrowser.sln --configuration Release
 ```
 
 ### Development Workflow
-```bash
-# Build TypeScript and run
-npm start
+```powershell
+# Build and run
+dotnet run --project JubileeBrowser.WPF/JubileeBrowser/JubileeBrowser.csproj
 
-# Watch mode for development (auto-rebuild on changes)
-npm run dev
+# Build Release version
+dotnet build JubileeBrowser.WPF/JubileeBrowser.sln -c Release
 
-# Build TypeScript only
-npm run build
-
-# Copy assets to dist folder
-npm run copy-assets
+# Publish self-contained
+dotnet publish JubileeBrowser.WPF/JubileeBrowser/JubileeBrowser.csproj `
+    -c Release -r win-x64 --self-contained true `
+    -o JubileeBrowser.WPF/publish
 ```
 
+### Building the Installer
+```powershell
+# Install WiX toolset (if not installed)
+dotnet tool install --global wix
 
-### Icon Generation
-The canonical application icon is stored at `website/images/jubilee-logo.png`. To regenerate platform-specific icons:
-
-```bash
-npm run generate-icons
-```
-
-This creates:
-- `assets/icons/icon.ico` - Windows multi-resolution icon
-- `assets/icons/icon.png` - High-resolution PNG
-- `assets/icons/512x512.png` - Linux icon
-- `assets/icons/icon-256.png` - 256x256 PNG
-
-The generated icons are used for:
-- Taskbar/dock icon (runtime)
-- Window icon
-- Start Menu/App Launcher entry
-- Installer and shortcuts
-- In-app header logo
-
-### Building for Distribution
-```bash
-# Package for Windows (creates NSIS installer)
-npm run package
-
-# Build without packaging
-npm run build
-
-# Package to directory (no installer)
-npm run package:dir
+# Build MSI installer
+wix build JubileeBrowser.WPF/JubileeBrowser.Installer/Package.wxs `
+    -d SourceDir="JubileeBrowser.WPF/publish/" `
+    -o JubileeBrowser.WPF/JubileeBrowser-Setup-8.0.6.msi
 ```
 
 ### Build Outputs
-- **Installer**: `release/jubilee-Setup-8.0.4.exe`
-- **Portable**: `release/win-unpacked/`
-- **Update Manifest**: `release/stable.yml` → `latest.yml`
-- **Blockmap**: `release/jubilee-Setup-8.0.4.exe.blockmap`
+- **Installer**: `JubileeBrowser.WPF/JubileeBrowser-Setup-8.0.6.msi`
+- **Published App**: `JubileeBrowser.WPF/publish/`
+- **Debug Build**: `JubileeBrowser.WPF/JubileeBrowser/bin/Debug/`
 
 ## Keyboard Shortcuts
 
@@ -203,138 +169,107 @@ npm run package:dir
 | **Ctrl+Shift+Tab** | Switch to previous tab |
 | **Ctrl+L** | Focus address bar |
 | **Ctrl+R** / **F5** | Reload current page |
-| **Ctrl+Shift+R** | Hard reload (ignore cache) |
 | **Alt+Left** | Go back |
 | **Alt+Right** | Go forward |
 | **Ctrl+Shift+M** | Toggle between Internet and Jubilee Bible modes |
-| **Ctrl+H** | Open history |
-| **Ctrl+D** | Bookmark current page |
 
-## Automatic Updates
+## Content Filtering
 
-### How It Works
-1. **Check for Updates**: Every 4 hours, browser checks `http://jubileebrowser.com/downloads/latest.yml`
-2. **Download in Background**: If update available, download starts automatically
-3. **Install on Quit**: Update installs when user closes the browser
-4. **Next Launch**: Browser runs the new version
+The browser includes a comprehensive blocklist with 309,000+ domains covering:
+- Adult content
+- Malware and phishing
+- Gambling
+- Violence
+- Other inappropriate content
 
-### Update Configuration
-```javascript
-// package.json
-"publish": {
-  "provider": "generic",
-  "url": "http://jubileebrowser.com/downloads",
-  "channel": "stable"
-}
-```
-
-### Update Files
-- **Manifest**: `latest.yml` (version info, SHA512 hash)
-- **Installer**: `jubilee-Setup-[version].exe`
-- **Blockmap**: `jubilee-Setup-[version].exe.blockmap` (delta updates)
-
-### For Users
-- **No action required**: Updates happen automatically
-- **No reinstalls**: Browser updates itself seamlessly
-- **No downtime**: Updates install on restart
-- **Always current**: Users stay on the latest version
-
-## .inspire Namespace
-
-The .inspire namespace provides human-readable addresses for Churchnet locations:
-
-### Core Locations
-- `inspire://home.inspire` - Churchnet home
-- `inspire://about.inspire` - About Churchnet
-- `inspire://guide.inspire` - Navigation guide
-- `inspire://welcome.inspire` - Welcome experience
-
-### Shorthand Support
-In Jubilee Bible Mode, you can use shorthand addresses:
-- `home.inspire` → `inspire://home.inspire`
-- `home` → `inspire://home.inspire`
-
-### Future Expansion
-- Distributed .inspire hosting
-- Community-created inspire locations
-- Scripture and immersive experiences
-- Identity-based access control
-
-## Configuration Files
-
-### User Data Location
-`%APPDATA%\jubilee\` (Windows)
-
-### Settings
-- **Preferences**: `settings.json`
-- **History**: `history.json`
-- **Bookmarks**: `bookmarks.json`
-- **Session State**: Restored on launch
-
-### Blacklist Configuration
-`blacklist.yaml` - Contains domains and keywords to block
-
+### Blocklist Configuration
+The blocklist is stored in `blacklist.yaml`:
 ```yaml
 domains:
-  - badsite.com
-  - example.harmful.com
+  - example-blocked-site.com
+  - another-blocked.com
 
 keywords:
-  - inappropriate
-  - blocked-term
+  - inappropriate-term
 ```
 
-## Deployment
+## Database (WorldWideBibleWeb)
+
+The browser integrates with a PostgreSQL database for private URL resolution:
+
+### Setup
+```powershell
+# Run database setup script
+.\database\run_db.ps1
+```
+
+### Tables
+- **WebSpaceTypes**: Catalogs web space types (inspire, apostle, webspace)
+- **DNS**: Maps private protocol URLs to public URLs
+- **HitCount_Daily**: Analytics for URL access
+
+### Resolver Functions
+- `resolve_private_url()` - Resolves private URLs to public
+- `reverse_resolve_url()` - Reverse lookup
+- `list_dns_by_type()` - List all DNS entries
+
+## Deployment for Organizations
 
 ### For Churches and Schools
 
-**Silent Installation**:
-```bash
-jubilee-Setup-8.0.4.exe /S
+**Silent MSI Installation**:
+```cmd
+msiexec /i JubileeBrowser-Setup-8.0.6.msi /quiet /log install.log
 ```
 
-**Network Deployment**:
-- Deploy via Group Policy
-- Use SCCM or similar tools
-- Automatic updates ensure consistency
-- No ongoing maintenance required
+**Group Policy Deployment**:
+1. Copy MSI to network share (e.g., `\\server\software\`)
+2. Create GPO linked to target OU
+3. Add MSI under Computer Configuration > Policies > Software Settings > Software Installation
+4. Computers install on next restart
 
-**Configuration**:
-- Custom blacklist files
-- Pre-configured settings
-- Centralized update management
+**SCCM/Intune Deployment**:
+- Use the MSI with standard deployment settings
+- Self-contained - no prerequisites needed
+- Per-machine installation for all users
 
 ### For Families
 - Download and install from website
-- Automatic updates keep everyone current
 - No technical expertise required
 - Built-in protection by design
 
 ## Troubleshooting
 
-### Updates Not Working
-1. Check internet connection
-2. Verify update server is accessible: http://jubileebrowser.com/downloads/latest.yml
-3. Check Windows firewall settings
-4. Review update logs in `%APPDATA%\jubilee\logs\`
+### Browser Won't Start
+1. Verify WebView2 Runtime is installed
+2. Check Event Viewer for application errors
+3. Run as Administrator to diagnose permission issues
 
-### Homepage Not Changing
-- Delete user data: `%APPDATA%\jubilee\`
-- Reinstall browser
-- Settings from old installation may persist
+### WebView2 Not Found
+1. Download from: https://developer.microsoft.com/microsoft-edge/webview2/
+2. Install the Evergreen Bootstrapper
+3. Restart Jubilee Browser
 
-### Icon Not Updating
-- Restart Windows to clear icon cache
-- Check desktop shortcut properties
-- Reinstall if issue persists
+### Content Not Blocking
+1. Verify `blacklist.yaml` exists in installation directory
+2. Check blocklist format is valid YAML
+3. Restart browser after blocklist changes
 
 ## Version History
 
-- **8.0.4** - Clean rebuild with Jubilee branding and unified homepage
-- **8.0.3** - Unified homepage, auto-updates, Jubilee icon
-- **1.0.2** - SSL security indicators in address bar
-- **1.0.1** - JubileeVerse.com integration
-- **1.0.0** - Initial release
+- **8.0.6** - WPF-only release, removed Electron version
+- **8.0.5** - Documentation updates
+- **8.0.4** - WPF application with WebView2, profile management
+- **8.0.3** - Database integration, private URL resolution
+
+## Project Structure
+
+| Folder | Description |
+|--------|-------------|
+| `JubileeBrowser.WPF/` | Main WPF browser application |
+| `database/` | PostgreSQL schema and scripts |
+| `website/` | Public website and downloads |
+| `docs/` | Technical documentation |
 
 ## Contributing
 
@@ -348,10 +283,10 @@ Copyright (c) 2024 Jubilee Software, Inc.
 
 ## Support
 
-- **Website**: http://jubileebrowser.com
+- **Website**: https://jubileebrowser.com
 - **Email**: support@jubileebrowser.com
-- **Documentation**: http://jubileebrowser.com/docs
-- **Downloads**: http://jubileebrowser.com/download.html
+- **Documentation**: https://jubileebrowser.com/docs
+- **Downloads**: https://jubileebrowser.com/download.html
 
 ---
 
